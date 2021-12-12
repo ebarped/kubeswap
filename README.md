@@ -1,7 +1,10 @@
 # kubeswap
 Tool to manage multiple kubeconfig files and swap between clusters easily
 
-## Commands
+# commands
+- kubeswap: displays the list of kubeconfigs in the db, same as subcommand use but without specifying a name
+
+## Subcommands
 - setup: creates the file that holds the database. By default, is created at ~/.kube/ks.db 
     --db \<path\>: create the database file on different location
 - list: lists all the kubeconfigs
@@ -18,6 +21,7 @@ I like to create an alias to kubeswap:
 
 ## Common flags
 - --log-level: sets loglevel (info/debug)
+- --kubeconfig: specify location of kubeconfig file
 - --db: specify location of the database file
 
 ## Technologies
