@@ -1,0 +1,40 @@
+project_name: kubeswap
+before:
+  hooks:
+    - go mod tidy
+    - rm -rf dist
+    - gofumpt -l -w .
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: linux
+        goarch: arm64
+      - goos: windows
+        goarch: arm64
+    ldflags:
+      - -s -w # go tool link flags
+archives:
+  - format_overrides:
+    - goos: windows
+      format: zip
+release:
+  disable: true #disable generating a release on gitlab/github
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+
