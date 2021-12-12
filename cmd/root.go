@@ -4,14 +4,24 @@ import (
 	"fmt"
 	"os"
 
+	badger "github.com/dgraph-io/badger/v3"
 	"github.com/ebarped/kubeswap/pkg/logger"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
 
-var logLevel string
+// variables to store the rootCMD flags
+var (
+	logLevel   string
+	kubeconfig string
+	dbPath     string
+)
 
-var log *zerolog.Logger
+// this variables are shared on package level
+var (
+	log *zerolog.Logger
+	db  *badger.DB
+)
 
 var rootCMD = &cobra.Command{
 	Use:              "kubeswap",
@@ -30,19 +40,39 @@ func Execute() {
 // adds all the flags of the root command
 // persistentFlags are the ones that are common to all subcommands
 func init() {
-	rootCMD.PersistentFlags().StringVar(&logLevel, "log-level", "info", "loglevel (info/debug")
+	userHome, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
+	dbPath = userHome + "/.kube/ks.db"
+
+	rootCMD.PersistentFlags().StringVar(&logLevel, "log-level", "info", "loglevel (info/debug)")
+	rootCMD.PersistentFlags().StringVar(&kubeconfig, "kubeconfig", "", "kubeconfig path")
+	rootCMD.PersistentFlags().StringVar(&dbPath, "db", dbPath, "db file path")
 }
 
 // execute common initial steps:
-// - create global logger and set the loglevel
+// - create package level logger and set the loglevel
+// - set the package level var userHome (to use in the init() func)
+// - open the db file
 func initConfig(cmd *cobra.Command, args []string) {
 	log = logger.New(logLevel)
 	log.Info().Msgf("loglevel set to %s", log.GetLevel().String())
+	openDB()
 }
 
-// This function is executed on startup to check
-// if the database file accesible and readable/writable
-// if any of the conditions are failed, print message to inform the user to execute setup command of change --db flag
-func checkState() {
-	fmt.Println("TODO")
+// openDB opens the db file
+func openDB() {
+	userHome, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
+
+	dbPath := userHome + "/.kube/ks.db"
+
+	db, err = badger.Open(badger.DefaultOptions(dbPath))
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+	}
+	defer db.Close()
 }
