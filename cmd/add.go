@@ -5,6 +5,8 @@ package cmd
 // 2º. add a new key-value to the DB, key=name, value=kubeconfig_content
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +27,16 @@ func init() {
 }
 
 func addFunc(cmd *cobra.Command, args []string) {
-	log.Info().Msgf("Executing add command with values %s", name)
+	log.Info().Msgf("Executing add command with name %s", name)
 	log.Info().Msgf("Interact with database located at %s", dbPath)
+
+	err := DB.Put([]byte(name), []byte("testValue"))
+	if err != nil {
+		log.Fatal().Msgf("Error escribiendo:%s", err)
+	}
+	val, err := DB.Get([]byte(name))
+	if err != nil {
+		log.Fatal().Msgf("Error leyendo:%s", err)
+	}
+	fmt.Printf("OBTUVE:%s", val)
 }
