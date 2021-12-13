@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	badger "github.com/dgraph-io/badger/v3"
+	"github.com/akrylysov/pogreb"
 	"github.com/ebarped/kubeswap/pkg/logger"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
@@ -20,7 +20,7 @@ var (
 // this variables are shared on package level
 var (
 	log *zerolog.Logger
-	db  *badger.DB
+	DB  *pogreb.DB
 )
 
 var rootCMD = &cobra.Command{
@@ -44,7 +44,7 @@ func init() {
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-	dbPath = userHome + "/.kube/ks.db"
+	dbPath = userHome + "/.kube/kubeswap.db"
 
 	rootCMD.PersistentFlags().StringVar(&logLevel, "log-level", "info", "loglevel (info/debug)")
 	rootCMD.PersistentFlags().StringVar(&kubeconfig, "kubeconfig", "", "kubeconfig path")
@@ -68,11 +68,19 @@ func openDB() {
 		log.Fatal().Msg(err.Error())
 	}
 
-	dbPath := userHome + "/.kube/ks.db"
+	dbPath := userHome + "/.kube/kubeswap.db"
 
-	db, err = badger.Open(badger.DefaultOptions(dbPath))
+	DB, err = pogreb.Open(dbPath, nil)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
+		return
 	}
-	defer db.Close()
+}
+
+func CloseDB() {
+	err := DB.Close()
+	if err != nil {
+		log.Fatal().Msg(err.Error())
+		return
+	}
 }
