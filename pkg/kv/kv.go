@@ -4,10 +4,11 @@ package kv
 
 import (
 	"github.com/akrylysov/pogreb"
+	"github.com/ebarped/kubeswap/pkg/kubeconfig"
 )
 
 type DB struct {
-	db *pogreb.DB
+	*pogreb.DB
 }
 
 func Open(path string) (*DB, error) {
@@ -21,24 +22,47 @@ func Open(path string) (*DB, error) {
 	return &DB{db}, nil
 }
 
-func (kv *DB) Put(key string, value []byte) error {
-	err := kv.db.Put([]byte(key), value)
+func (kv *DB) PutKubeconfig(key string, value []byte) error {
+	err := kv.Put([]byte(key), value)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (kv *DB) Get(key string) (string, error) {
-	val, err := kv.db.Get([]byte(key))
-	if err != nil {
-		return "", err
-	}
-	return string(val), nil
-}
-
 func (kv *DB) CloseDB() {
 	// this should:
 	// - compress the real database folder into a single file
-	kv.db.Close()
+	kv.Close()
+}
+
+func (kv *DB) GetKubeconfig(key string) (*kubeconfig.Kubeconfig, error) {
+	val, err := kv.Get([]byte(key))
+	if err != nil {
+		return nil, err
+	}
+	return &kubeconfig.Kubeconfig{
+		Name:    key,
+		Content: string(val),
+	}, nil
+}
+
+func (kv *DB) GetAll() ([]kubeconfig.Kubeconfig, error) {
+	var items []kubeconfig.Kubeconfig
+	it := kv.Items()
+	for {
+		key, val, err := it.Next()
+		if err == pogreb.ErrIterationDone {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		kc := kubeconfig.Kubeconfig{
+			Name:    string(key),
+			Content: string(val),
+		}
+		items = append(items, kc)
+	}
+	return items, nil
 }

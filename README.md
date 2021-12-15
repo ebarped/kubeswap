@@ -5,8 +5,6 @@ Tool to manage multiple kubeconfig files and swap between clusters easily
 - kubeswap: displays the list of kubeconfigs in the db, same as subcommand use but without specifying a name
 
 ## Subcommands
-- setup: creates the file that holds the database. By default, is created at ~/.kube/kubeswap.db 
-    --db \<path\>: create the database file on different location
 - list: lists all the kubeconfigs
 - add \<name\> -f \<kubeconfig\>: adds a new kubeconfig identified as \<name\> from \<kubeconfig\> file to the db
 - remove \<name\>: removes a kubeconfig from the db
@@ -40,9 +38,16 @@ kubeswap add --name test --kubeconfig test-kubeconfig.yml
 ```
 
 ## Test
+- add:
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap add --name test --kubeconfig test/kubeconfig.yml --db /tmp/test
 ```
 
+- list:
+```bash
+./dist/kubeswap_linux_amd64/kubeswap list --db /tmp/test
+```
+
 ## TODO
-Get homeDir in windows, linux & mac
+- Get homeDir in windows, linux & mac
+- kv.go: GetKubeconfig()
