@@ -36,7 +36,7 @@ func addFunc(cmd *cobra.Command, args []string) {
 
 	kc, err := kubeconfig.New(name, kubeconfigPath)
 	if err != nil {
-		panic(err)
+		log.Fatal().Msg(err.Error())
 	}
 
 	db, err := kv.Open(dbPath)
@@ -47,7 +47,7 @@ func addFunc(cmd *cobra.Command, args []string) {
 
 	kconfig, err := kc.Config()
 	if err != nil {
-		panic(err)
+		log.Fatal().Msg(err.Error())
 	}
 
 	err = db.Put(kc.Name(), kconfig)
