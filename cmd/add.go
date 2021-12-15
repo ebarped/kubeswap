@@ -5,8 +5,8 @@ package cmd
 // 2º. add a new key-value to the DB, key=name, value=kubeconfig_content
 
 import (
-	"github.com/akrylysov/pogreb"
 	"github.com/ebarped/kubeswap/pkg/kubeconfig"
+	"github.com/ebarped/kubeswap/pkg/kv"
 	"github.com/spf13/cobra"
 )
 
@@ -39,27 +39,21 @@ func addFunc(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	db, err := pogreb.Open(dbPath, nil)
+	db, err := kv.Open(dbPath)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 		return
 	}
-	defer db.Close()
+	defer db.CloseDB()
 
 	kconfig, err := kc.Config()
 	if err != nil {
 		panic(err)
 	}
 
-	err = db.Put([]byte(kc.Name()), kconfig)
+	err = db.Put(kc.Name(), kconfig)
 	if err != nil {
 		log.Fatal().Msgf("Error escribiendo:%s", err)
 	}
 	log.Info().Str("action", "adding new kubeconfig to the database").Str("key", kc.Name()).Str("value", string(kconfig)).Send()
-
-	//val, err := db.Get([]byte(kc.Name()))
-	//if err != nil {
-	//	log.Fatal().Msgf("Error leyendo:%s", err)
-	//}
-	//fmt.Printf("OBTUVE:%s", val)
 }
