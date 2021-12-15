@@ -12,6 +12,11 @@ import (
 // variables to store the rootCMD flags
 var logLevel string
 
+var (
+	kubeconfigPath string // path to the kubeconfig file
+	dbPath         string // path to the db file
+)
+
 // variable shared at package level (used by subcommands)
 var log *zerolog.Logger
 
@@ -25,6 +30,8 @@ func init() {
 	dbPath = userHome + "/.kube/kubeswap.db"
 
 	rootCMD.PersistentFlags().StringVar(&logLevel, "loglevel", "info", "loglevel (info/debug)")
+	rootCMD.PersistentFlags().StringVar(&dbPath, "db", dbPath, "db file path")
+	rootCMD.PersistentFlags().StringVarP(&kubeconfigPath, "kubeconfig", "", "", "kubeconfig's path")
 }
 
 // execute common initial steps
