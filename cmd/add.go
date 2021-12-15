@@ -36,23 +36,23 @@ func addFunc(cmd *cobra.Command, args []string) {
 
 	kc, err := kubeconfig.New(name, kubeconfigPath)
 	if err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().Str("error", err.Error()).Msg("error creating new Kubeconfig struct")
 	}
 
 	db, err := kv.Open(dbPath)
 	if err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().Str("error", err.Error()).Msg("error opening kv database")
 	}
 	defer db.CloseDB()
 
 	kconfig, err := kc.Config()
 	if err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().Str("error", err.Error()).Msg("error obtaining the content of the kubeconfig")
 	}
 
 	err = db.Put(kc.Name(), kconfig)
 	if err != nil {
-		log.Fatal().Msgf("Error escribiendo:%s", err)
+		log.Fatal().Str("error", err.Error()).Msg("error putting new key-value to the database")
 	}
 	log.Info().Str("action", "adding new kubeconfig to the database").Str("key", kc.Name()).Str("value", string(kconfig)).Send()
 }

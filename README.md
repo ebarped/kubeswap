@@ -45,3 +45,4 @@ kubeswap add --name test --kubeconfig test-kubeconfig.yml
 ```
 
 ## TODO
+Get homeDir in windows, linux & mac

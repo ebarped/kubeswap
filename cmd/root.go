@@ -20,7 +20,7 @@ var log *zerolog.Logger
 func init() {
 	userHome, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().Str("error", err.Error()).Msg("error getting the homeDir of the user")
 	}
 	dbPath = userHome + "/.kube/kubeswap.db"
 
