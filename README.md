@@ -20,7 +20,7 @@ I like to create an alias to kubeswap:
 `alias ks=kubeswap`
 
 ## Common flags
-- --log-level: sets loglevel (info/debug)
+- --loglevel: sets loglevel (info/debug)
 - --kubeconfig: specify location of kubeconfig file
 - --db: specify location of the database file
 
