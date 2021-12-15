@@ -39,4 +39,9 @@ I like to create an alias to kubeswap:
 kubeswap add --name test --kubeconfig test-kubeconfig.yml
 ```
 
+## Test
+```bash
+./dist/kubeswap_linux_amd64/kubeswap add --name test --kubeconfig test/kubeconfig.yml --db /tmp/test
+```
+
 ## TODO
