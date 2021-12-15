@@ -24,13 +24,13 @@ func init() {
 	}
 	dbPath = userHome + "/.kube/kubeswap.db"
 
-	rootCMD.PersistentFlags().StringVar(&logLevel, "log-level", "info", "loglevel (info/debug)")
+	rootCMD.PersistentFlags().StringVar(&logLevel, "loglevel", "info", "loglevel (info/debug)")
 }
 
 // execute common initial steps
 func initConfig(cmd *cobra.Command, args []string) {
 	log = logger.New(logLevel)
-	log.Info().Msgf("loglevel set to %s", log.GetLevel().String())
+	log.Debug().Msgf("loglevel set to %s", log.GetLevel().String())
 }
 
 var rootCMD = &cobra.Command{
