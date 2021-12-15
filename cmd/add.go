@@ -42,7 +42,6 @@ func addFunc(cmd *cobra.Command, args []string) {
 	db, err := kv.Open(dbPath)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
-		return
 	}
 	defer db.CloseDB()
 
