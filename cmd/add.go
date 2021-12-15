@@ -27,7 +27,7 @@ func init() {
 	rootCMD.AddCommand(addCMD)
 
 	addCMD.Flags().StringVarP(&name, "name", "", "", "name of the kubeconfig")
-	rootCMD.PersistentFlags().StringVar(&dbPath, "db", dbPath, "db file path")
+	addCMD.PersistentFlags().StringVar(&dbPath, "db", dbPath, "db file path")
 	addCMD.Flags().StringVarP(&kubeconfigPath, "kubeconfig", "", "", "kubeconfig's path")
 }
 
