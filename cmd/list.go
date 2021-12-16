@@ -1,9 +1,8 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/ebarped/kubeswap/pkg/kv"
+	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )
 
@@ -26,13 +25,19 @@ func listFunc(cmd *cobra.Command, args []string) {
 		log.Fatal().Str("error", err.Error()).Msg("error opening kv database")
 	}
 	defer db.CloseDB()
+
+	var list []pterm.BulletListItem
+
 	items, err := db.GetAll()
 	if err != nil {
 		log.Fatal().Str("error", err.Error()).Msg("error listing items from database")
 	}
-	fmt.Printf("List of kubeconfigs:\n")
 	for _, kc := range items {
-		fmt.Printf("Name: %s\n", kc.Name)
-		fmt.Printf("Content:\n%s\n", kc.Content)
+		list = append(list, pterm.BulletListItem{
+			Level:  0,
+			Text:   kc.Name,
+			Bullet: "⎈",
+		})
 	}
+	pterm.DefaultBulletList.WithItems(list).Render()
 }
