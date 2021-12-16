@@ -42,7 +42,6 @@ kubeswap add --name test --kubeconfig test-kubeconfig.yml
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap add --name test --kubeconfig test/kubeconfig.yml --db /tmp/test
 ```
-
 - list:
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap list --db /tmp/test
@@ -50,4 +49,3 @@ kubeswap add --name test --kubeconfig test-kubeconfig.yml
 
 ## TODO
 - Get homeDir in windows, linux & mac
-- kv.go: GetKubeconfig()
