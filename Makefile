@@ -10,6 +10,7 @@ MAIN = main.go
 OUTBIN = dist/$(OS)_$(ARCH)/$(BIN)
 
 ############## TARGETS SECTION ##############
+.PHONY: all test clean
 build: # @HELP builds for current GOOS/GOARCH
 build:
 	@goreleaser build --snapshot --single-target --skip-validate
@@ -34,6 +35,10 @@ dep-upgrade:
 clean: # @HELP removes built binaries and temporary files
 clean:
 	@rm -rf dist
+
+test: # @HELP executes the test/test.sh script
+test:
+	@./test/test.sh
 
 help: # @HELP prints this message
 help:

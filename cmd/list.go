@@ -34,9 +34,10 @@ func listFunc(cmd *cobra.Command, args []string) {
 	}
 	for _, kc := range items {
 		list = append(list, pterm.BulletListItem{
-			Level:  0,
-			Text:   kc.Name,
-			Bullet: "⎈",
+			Level:       0,
+			Text:        kc.Name,
+			Bullet:      "⎈",
+			BulletStyle: pterm.NewStyle(pterm.FgBlue),
 		})
 	}
 	pterm.DefaultBulletList.WithItems(list).Render()
