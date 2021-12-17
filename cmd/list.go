@@ -10,7 +10,7 @@ import (
 
 var listCMD = &cobra.Command{
 	Use:   "list",
-	Short: "lists all the kubeconfigs in the db",
+	Short: "Lists all the kubeconfigs in the db",
 	Run:   listFunc,
 }
 

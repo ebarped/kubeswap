@@ -10,7 +10,7 @@ import (
 
 var printCMD = &cobra.Command{
 	Use:   "print -n <name>",
-	Short: "prints the content of the kubeconfig referenced by <name>",
+	Short: "Prints the content of the kubeconfig referenced by <name>",
 	Run:   printFunc,
 }
 

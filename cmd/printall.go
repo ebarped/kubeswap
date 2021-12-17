@@ -10,7 +10,7 @@ import (
 
 var printallCMD = &cobra.Command{
 	Use:   "printall",
-	Short: "prints the content of all the kubeconfigs from the db",
+	Short: "Prints the content of all the kubeconfigs from the db",
 	Run:   printallFunc,
 }
 
