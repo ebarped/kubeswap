@@ -3,6 +3,9 @@ package kv
 // This package abstracts the key-value database library used
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/akrylysov/pogreb"
 	"github.com/ebarped/kubeswap/pkg/kubeconfig"
 )
@@ -23,7 +26,15 @@ func Open(path string) (*DB, error) {
 }
 
 func (kv *DB) PutKubeconfig(key string, value []byte) error {
-	err := kv.Put([]byte(key), value)
+	has, err := kv.Has([]byte(key))
+	if err != nil {
+		return err
+	}
+	if has {
+		return fmt.Errorf("key already exists in the db: %s", key)
+	}
+
+	err = kv.Put([]byte(key), value)
 	if err != nil {
 		return err
 	}
@@ -33,7 +44,10 @@ func (kv *DB) PutKubeconfig(key string, value []byte) error {
 func (kv *DB) CloseDB() {
 	// this should:
 	// - compress the real database folder into a single file
-	kv.Close()
+	err := kv.Close()
+	if err != nil {
+		log.Fatalf("error closing db: %s", err)
+	}
 }
 
 func (kv *DB) GetKubeconfig(key string) (*kubeconfig.Kubeconfig, error) {
