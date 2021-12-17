@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/ebarped/kubeswap/pkg/kubeconfig"
 	"github.com/ebarped/kubeswap/pkg/kv"
 	"github.com/spf13/cobra"
@@ -12,7 +14,7 @@ var (
 )
 
 var addCMD = &cobra.Command{
-	Use:   "add <name> -f <kubeconfig>",
+	Use:   "add --name <name> -f <kubeconfig>",
 	Short: "adds a new kubeconfig to the database",
 	Run:   addFunc,
 }
@@ -20,23 +22,30 @@ var addCMD = &cobra.Command{
 // init adds this command and his flags
 func init() {
 	rootCMD.AddCommand(addCMD)
-	addCMD.Flags().StringVarP(&name, "name", "", "", "name of the kubeconfig")
+	addCMD.Flags().StringVarP(&name, "name", "n", "", "name of the kubeconfig")
 	addCMD.MarkFlagRequired("name")
 	addCMD.Flags().StringVar(&kubeconfigPath, "kubeconfig", "", "kubeconfig's path")
 	addCMD.MarkFlagRequired("kubeconfig")
 }
 
 func addFunc(cmd *cobra.Command, args []string) {
+	retcode := 0
+	defer func() { os.Exit(retcode) }()
+
 	log.Debug().Str("command", "add").Str("name", name).Str("kubeconfig path", kubeconfigPath).Str("database", dbPath).Send()
 
 	kc, err := kubeconfig.New(name, kubeconfigPath)
 	if err != nil {
-		log.Fatal().Str("error", err.Error()).Msg("error creating new Kubeconfig struct")
+		log.Error().Str("error", err.Error()).Msg("error creating new Kubeconfig struct")
+		retcode = 1
+		return
 	}
 
 	db, err := kv.Open(dbPath)
 	if err != nil {
-		log.Fatal().Str("error", err.Error()).Msg("error opening kv database")
+		log.Error().Str("error", err.Error()).Msg("error opening kv database")
+		retcode = 1
+		return
 	}
 	defer db.CloseDB()
 
@@ -45,5 +54,7 @@ func addFunc(cmd *cobra.Command, args []string) {
 	err = db.PutKubeconfig(kc.Name, []byte(kc.Content))
 	if err != nil {
 		log.Error().Str("error", err.Error()).Msg("error putting new key-value to the database")
+		retcode = 1
+		return
 	}
 }
