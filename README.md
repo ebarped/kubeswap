@@ -1,7 +1,38 @@
-# kubeswap
+# Kubeswap
 Tool to manage multiple kubeconfig files and swap between clusters easily
 
-# commands
+```yaml
+
+  ██   ██ ██    ██ ██████  ███████ ███████ ██     ██  █████  ██████  
+  ██  ██  ██    ██ ██   ██ ██      ██      ██     ██ ██   ██ ██   ██ 
+  █████   ██    ██ ██████  █████   ███████ ██  █  ██ ███████ ██████  
+  ██  ██  ██    ██ ██   ██ ██           ██ ██ ███ ██ ██   ██ ██      
+  ██   ██  ██████  ██████  ███████ ███████  ███ ███  ██   ██ ██
+
+Manage your kubeconfig files easily
+
+Usage:
+  kubeswap [command]
+
+Available Commands:
+  add         adds a new kubeconfig to the database
+  completion  generate the autocompletion script for the specified shell
+  delete      deletes a kubeconfig from the database
+  help        Help about any command
+  list        lists all the kubeconfigs in the db
+  print       prints the content of the kubeconfig referenced by <name>
+  printall    prints the content of all the kubeconfigs from the db
+  version     Print the version number
+
+Flags:
+      --db string         db file path (default "$HOME/.kube/kubeswap.db")
+  -h, --help              help for kubeswap
+      --loglevel string   loglevel (info/debug) (default "info")
+
+Use "kubeswap [command] --help" for more information about a command.
+```
+
+# Commands
 - kubeswap: displays the list of kubeconfigs in the db, same as subcommand use but without specifying a name
 
 ## Subcommands
@@ -18,25 +49,12 @@ Tool to manage multiple kubeconfig files and swap between clusters easily
 I like to create an alias to kubeswap:
 `alias ks=kubeswap`
 
-## Common flags
-- --loglevel: sets loglevel (info/debug)
-- --kubeconfig: specify location of kubeconfig file
-- --db: specify location of the database file
-
 ## Technologies
 - cobra: cli library
 - fzf: fuzzy finding to enable more easisly
 - pogreb: key-value database to store the files
 - zerolog: structured (and fast) logger
 
-## Differences with other projects
-- [kubecm](https://github.com/sunny0826/kubecm): kubecm uses a single kubeconfig file. This projects uses a key-value DB to store multiple separated kubeconfigs.
-
-## Usage
-### Add
-```
-kubeswap add --name test --kubeconfig test-kubeconfig.yml
-```
 
 ## Test
 - Init:
@@ -65,4 +83,16 @@ make clean build test
 ```
 
 ## TODO
-- Get homeDir in windows, linux & mac
+- Test in windows & linux
+- use command:
+  - use: prints a list of the keys and allows the user to select the desired kubeconfig
+  - use -n \<name\>: modify current kubeconfig to the kubeconfig identified by name
+- status command:
+  - status: checks if the clusters referenced by each kubeconfig are reachable
+    - \<name>\: checks if the cluster of \<name\> kubeconfig is reachable
+- Compress the db into a single file, to enable
+  - simplicity: the user has a single file with all the database, not a directory
+  - backup/restore: easier to backup, restore or move between machines
+
+## Differences with other projects
+- [kubecm](https://github.com/sunny0826/kubecm): kubecm uses a single kubeconfig file, meanwhile this projects uses a key-value DB to store multiple kubeconfigs, but separated one from another. I use a lot of different kubeconfig files, and some of them are ephemeral (lifetime under 1 day), so it makes no point to merge them in a "master" kubeconfig.
