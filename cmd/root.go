@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ebarped/kubeswap/pkg/logger"
+	"github.com/pterm/pterm"
 	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 )
@@ -45,6 +46,7 @@ func initConfig(cmd *cobra.Command, args []string) {
 var rootCMD = &cobra.Command{
 	Use:              "kubeswap",
 	Short:            "tool to manage multiple kubeconfig files and change between clusters easily",
+	Long:             printLogo(),
 	PersistentPreRun: initConfig,
 }
 
@@ -54,4 +56,20 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func printLogo() string {
+	logo := pterm.FgBlue.Sprint(`
+  ██   ██ ██    ██ ██████  ███████ ███████ ██     ██  █████  ██████  
+  ██  ██  ██    ██ ██   ██ ██      ██      ██     ██ ██   ██ ██   ██ 
+  █████   ██    ██ ██████  █████   ███████ ██  █  ██ ███████ ██████  
+  ██  ██  ██    ██ ██   ██ ██           ██ ██ ███ ██ ██   ██ ██      
+  ██   ██  ██████  ██████  ███████ ███████  ███ ███  ██   ██ ██
+`)
+
+	subtext := pterm.FgLightCyan.Sprintf("Manage your kubeconfig files easily")
+	return fmt.Sprintf(`
+%s
+%s
+`, logo, subtext)
 }

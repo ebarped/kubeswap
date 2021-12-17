@@ -26,7 +26,7 @@ I like to create an alias to kubeswap:
 ## Technologies
 - cobra: cli library
 - fzf: fuzzy finding to enable more easisly
-- pogreb: key-value db that provides persistence
+- pogreb: key-value database to store the files
 - zerolog: structured (and fast) logger
 
 ## Differences with other projects
