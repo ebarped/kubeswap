@@ -25,22 +25,6 @@ func Open(path string) (*DB, error) {
 	return &DB{db}, nil
 }
 
-func (kv *DB) PutKubeconfig(key string, value []byte) error {
-	exist, err := kv.Has([]byte(key))
-	if err != nil {
-		return err
-	}
-	if exist {
-		return fmt.Errorf("key already exists in the db: %s", key)
-	}
-
-	err = kv.Put([]byte(key), value)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func (kv *DB) CloseDB() {
 	// this should:
 	// - compress the real database folder into a single file
@@ -67,6 +51,38 @@ func (kv *DB) GetKubeconfig(key string) (*kubeconfig.Kubeconfig, error) {
 		Name:    key,
 		Content: string(val),
 	}, nil
+}
+
+func (kv *DB) PutKubeconfig(key string, value []byte) error {
+	exist, err := kv.Has([]byte(key))
+	if err != nil {
+		return err
+	}
+	if exist {
+		return fmt.Errorf("key already exists in the db: %s", key)
+	}
+
+	err = kv.Put([]byte(key), value)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (kv *DB) DeleteKubeconfig(key string) error {
+	exist, err := kv.Has([]byte(key))
+	if err != nil {
+		return err
+	}
+	if !exist {
+		return fmt.Errorf("key does not exist in the db: %s", key)
+	}
+
+	err = kv.Delete([]byte(key))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (kv *DB) GetAll() ([]kubeconfig.Kubeconfig, error) {

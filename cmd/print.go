@@ -40,4 +40,5 @@ func printFunc(cmd *cobra.Command, args []string) {
 		return
 	}
 	fmt.Println(kc.Content)
+	log.Debug().Str("command", "print").Str("key", kc.Name).Str("result", "successful").Send()
 }
