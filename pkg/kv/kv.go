@@ -26,11 +26,11 @@ func Open(path string) (*DB, error) {
 }
 
 func (kv *DB) PutKubeconfig(key string, value []byte) error {
-	has, err := kv.Has([]byte(key))
+	exist, err := kv.Has([]byte(key))
 	if err != nil {
 		return err
 	}
-	if has {
+	if exist {
 		return fmt.Errorf("key already exists in the db: %s", key)
 	}
 
@@ -51,6 +51,14 @@ func (kv *DB) CloseDB() {
 }
 
 func (kv *DB) GetKubeconfig(key string) (*kubeconfig.Kubeconfig, error) {
+	exist, err := kv.Has([]byte(key))
+	if err != nil {
+		return nil, err
+	}
+	if !exist {
+		return nil, fmt.Errorf("key does not exist in the db: %s", key)
+	}
+
 	val, err := kv.Get([]byte(key))
 	if err != nil {
 		return nil, err

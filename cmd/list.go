@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/ebarped/kubeswap/pkg/kv"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
@@ -18,11 +20,16 @@ func init() {
 }
 
 func listFunc(cmd *cobra.Command, args []string) {
+	retcode := 0
+	defer func() { os.Exit(retcode) }()
+
 	log.Debug().Str("command", "list").Str("database", dbPath).Send()
 
 	db, err := kv.Open(dbPath)
 	if err != nil {
 		log.Error().Str("error", err.Error()).Msg("error opening kv database")
+		retcode = 1
+		return
 	}
 	defer db.CloseDB()
 
@@ -31,6 +38,8 @@ func listFunc(cmd *cobra.Command, args []string) {
 	items, err := db.GetAll()
 	if err != nil {
 		log.Error().Str("error", err.Error()).Msg("error listing items from database")
+		retcode = 1
+		return
 	}
 	for _, kc := range items {
 		list = append(list, pterm.BulletListItem{
