@@ -50,4 +50,5 @@ func listFunc(cmd *cobra.Command, args []string) {
 		})
 	}
 	pterm.DefaultBulletList.WithItems(list).Render()
+	log.Debug().Str("command", "list").Str("result", "successful").Send()
 }

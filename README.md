@@ -6,10 +6,11 @@ Tool to manage multiple kubeconfig files and swap between clusters easily
 
 ## Subcommands
 - list: lists all the kubeconfigs
-- add \<name\> -f \<kubeconfig\>: adds a new kubeconfig identified as \<name\> from \<kubeconfig\> file to the db
-- delete \<name\>: removes a kubeconfig from the db
-- use \<name\>: modify current kubeconfig to the kubeconfig identified by name
-- print \<name\>: print the kubeconfig identified by name
+- add -n \<name\> -f \<kubeconfig\>: adds a new kubeconfig identified as \<name\> from \<kubeconfig\> file to the db
+- delete -n \<name\>: removes a kubeconfig from the db
+- use -n \<name\>: modify current kubeconfig to the kubeconfig identified by name
+- print -n \<name\>: print the kubeconfig identified by name
+- printall: prints all the kubeconfig from the db
 - status: checks if the clusters referenced by each kubeconfig are reachable
   - \<name>\: checks if the cluster of the \<name\> kubeconfig is reachable
 
@@ -38,6 +39,10 @@ kubeswap add --name test --kubeconfig test-kubeconfig.yml
 ```
 
 ## Test
+- Init:
+```bash
+make clean build test
+```
 - add:
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap add --name test --kubeconfig test/kubeconfig.yml --db /tmp/test
@@ -45,6 +50,14 @@ kubeswap add --name test --kubeconfig test-kubeconfig.yml
 - list:
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap list --db /tmp/test
+```
+- print:
+```bash
+./dist/kubeswap_linux_amd64/kubeswap print -n test-0 --db /tmp/test
+```
+- delete:
+```bash
+./dist/kubeswap_linux_amd64/kubeswap delete -n test-0 --db /tmp/test
 ```
 
 ## TODO

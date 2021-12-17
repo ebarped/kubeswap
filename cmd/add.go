@@ -8,11 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	name           string // key to store the kubeconfig in the db
-	kubeconfigPath string // path to the kubeconfig
-)
-
 var addCMD = &cobra.Command{
 	Use:   "add --name <name> -f <kubeconfig>",
 	Short: "adds a new kubeconfig to the database",
@@ -43,7 +38,7 @@ func addFunc(cmd *cobra.Command, args []string) {
 
 	db, err := kv.Open(dbPath)
 	if err != nil {
-		log.Error().Str("error", err.Error()).Msg("error opening kv database")
+		log.Error().Str("error", err.Error()).Str("db", dbPath).Msg("error opening kv database")
 		retcode = 1
 		return
 	}
@@ -57,4 +52,5 @@ func addFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
+	log.Debug().Str("command", "add").Str("key", kc.Name).Str("result", "successful").Send()
 }
