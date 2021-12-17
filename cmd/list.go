@@ -22,7 +22,7 @@ func listFunc(cmd *cobra.Command, args []string) {
 
 	db, err := kv.Open(dbPath)
 	if err != nil {
-		log.Fatal().Str("error", err.Error()).Msg("error opening kv database")
+		log.Error().Str("error", err.Error()).Msg("error opening kv database")
 	}
 	defer db.CloseDB()
 
@@ -30,7 +30,7 @@ func listFunc(cmd *cobra.Command, args []string) {
 
 	items, err := db.GetAll()
 	if err != nil {
-		log.Fatal().Str("error", err.Error()).Msg("error listing items from database")
+		log.Error().Str("error", err.Error()).Msg("error listing items from database")
 	}
 	for _, kc := range items {
 		list = append(list, pterm.BulletListItem{

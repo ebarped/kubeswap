@@ -34,9 +34,10 @@ func addFunc(cmd *cobra.Command, args []string) {
 	}
 	defer db.CloseDB()
 
+	log.Debug().Str("action", "adding new kubeconfig to the database").Str("key", kc.Name).Str("value", kc.Content).Send()
+
 	err = db.PutKubeconfig(kc.Name, []byte(kc.Content))
 	if err != nil {
-		log.Fatal().Str("error", err.Error()).Msg("error putting new key-value to the database")
+		log.Error().Str("error", err.Error()).Msg("error putting new key-value to the database")
 	}
-	log.Info().Str("action", "adding new kubeconfig to the database").Str("key", kc.Name).Str("value", kc.Content).Send()
 }
