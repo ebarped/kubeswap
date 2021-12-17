@@ -55,6 +55,10 @@ make clean build test
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap print -n test-0 --db /tmp/test
 ```
+- printall:
+```bash
+./dist/kubeswap_linux_amd64/kubeswap printall --db /tmp/test
+```
 - delete:
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap delete -n test-0 --db /tmp/test
