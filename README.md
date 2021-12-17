@@ -7,7 +7,7 @@ Tool to manage multiple kubeconfig files and swap between clusters easily
 ## Subcommands
 - list: lists all the kubeconfigs
 - add \<name\> -f \<kubeconfig\>: adds a new kubeconfig identified as \<name\> from \<kubeconfig\> file to the db
-- remove \<name\>: removes a kubeconfig from the db
+- delete \<name\>: removes a kubeconfig from the db
 - use \<name\>: modify current kubeconfig to the kubeconfig identified by name
 - print \<name\>: print the kubeconfig identified by name
 - status: checks if the clusters referenced by each kubeconfig are reachable

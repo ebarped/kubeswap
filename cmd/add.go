@@ -6,7 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var name string // key to store the kubeconfig in the db
+var (
+	name           string // key to store the kubeconfig in the db
+	kubeconfigPath string // path to the kubeconfig
+)
 
 var addCMD = &cobra.Command{
 	Use:   "add <name> -f <kubeconfig>",
@@ -18,6 +21,9 @@ var addCMD = &cobra.Command{
 func init() {
 	rootCMD.AddCommand(addCMD)
 	addCMD.Flags().StringVarP(&name, "name", "", "", "name of the kubeconfig")
+	addCMD.MarkFlagRequired("name")
+	addCMD.Flags().StringVar(&kubeconfigPath, "kubeconfig", "", "kubeconfig's path")
+	addCMD.MarkFlagRequired("kubeconfig")
 }
 
 func addFunc(cmd *cobra.Command, args []string) {
