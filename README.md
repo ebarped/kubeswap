@@ -15,13 +15,13 @@ Usage:
   kubeswap [command]
 
 Available Commands:
-  add         adds a new kubeconfig to the database
+  add         Adds a new kubeconfig to the database
   completion  generate the autocompletion script for the specified shell
-  delete      deletes a kubeconfig from the database
+  delete      Deletes a kubeconfig from the database
   help        Help about any command
-  list        lists all the kubeconfigs in the db
-  print       prints the content of the kubeconfig referenced by <name>
-  printall    prints the content of all the kubeconfigs from the db
+  list        Lists all the kubeconfigs in the db
+  print       Prints the content of the kubeconfig referenced by <name>
+  printall    Prints the content of all the kubeconfigs from the db
   version     Print the version number
 
 Flags:

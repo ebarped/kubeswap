@@ -9,7 +9,7 @@ import (
 
 var deleteCMD = &cobra.Command{
 	Use:   "delete --name <name>",
-	Short: "deletes a kubeconfig from the database",
+	Short: "Deletes a kubeconfig from the database",
 	Run:   deleteFunc,
 }
 
