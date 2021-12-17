@@ -41,6 +41,7 @@ func listFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
+
 	for _, kc := range items {
 		list = append(list, pterm.BulletListItem{
 			Level:       0,
