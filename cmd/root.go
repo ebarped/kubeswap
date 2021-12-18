@@ -35,6 +35,8 @@ func init() {
 
 	rootCMD.PersistentFlags().StringVar(&logLevel, "loglevel", "info", "loglevel (info/debug)")
 	rootCMD.PersistentFlags().StringVar(&dbPath, "db", dbPath, "db file path")
+
+	rootCMD.AddCommand(completionCmd)
 }
 
 // execute common initial steps
