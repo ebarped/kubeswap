@@ -83,7 +83,6 @@ make clean build test
 ```
 
 ## TODO
-- Add shell completion
 - Test in windows & linux
 - use command:
   - use: prints a list of the keys and allows the user to select the desired kubeconfig

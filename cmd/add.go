@@ -9,7 +9,7 @@ import (
 )
 
 var addCMD = &cobra.Command{
-	Use:   "add --name <name> -f <kubeconfig>",
+	Use:   "add -n <name> -f <kubeconfig>",
 	Short: "Adds a new kubeconfig to the database",
 	Run:   addFunc,
 }
@@ -17,13 +17,16 @@ var addCMD = &cobra.Command{
 // init adds this command and his flags
 func init() {
 	rootCMD.AddCommand(addCMD)
-	addCMD.Flags().StringVarP(&name, "name", "n", "", "name of the kubeconfig")
+	addCMD.Flags().StringP("name", "n", "", "name of the kubeconfig")
 	addCMD.MarkFlagRequired("name")
-	addCMD.Flags().StringVar(&kubeconfigPath, "kubeconfig", "", "kubeconfig's path")
+	addCMD.Flags().String("kubeconfig", "", "kubeconfig's path")
 	addCMD.MarkFlagRequired("kubeconfig")
 }
 
 func addFunc(cmd *cobra.Command, args []string) {
+	name, _ := cmd.Flags().GetString("name")
+	kubeconfigPath, _ := cmd.Flags().GetString("kubeconfig")
+
 	retcode := 0
 	defer func() { os.Exit(retcode) }()
 

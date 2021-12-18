@@ -15,12 +15,6 @@ var logLevel string
 
 var dbPath string // path to the db file
 
-// variables filled by flags on different subcommands (add, delete..)
-var (
-	name           string // key to store the kubeconfig in the db
-	kubeconfigPath string // path to the kubeconfig
-)
-
 // variable shared at package level (used by subcommands)
 var log *zerolog.Logger
 

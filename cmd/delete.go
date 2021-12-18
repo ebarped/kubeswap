@@ -8,7 +8,7 @@ import (
 )
 
 var deleteCMD = &cobra.Command{
-	Use:   "delete --name <name>",
+	Use:   "delete -n <name>",
 	Short: "Deletes a kubeconfig from the database",
 	Run:   deleteFunc,
 }
@@ -16,11 +16,13 @@ var deleteCMD = &cobra.Command{
 // init adds this command and his flags
 func init() {
 	rootCMD.AddCommand(deleteCMD)
-	deleteCMD.Flags().StringVarP(&name, "name", "n", "", "name of the kubeconfig")
+	deleteCMD.Flags().StringP("name", "n", "", "name of the kubeconfig")
 	deleteCMD.MarkFlagRequired("name")
 }
 
 func deleteFunc(cmd *cobra.Command, args []string) {
+	name, _ := cmd.Flags().GetString("name")
+
 	retcode := 0
 	defer func() { os.Exit(retcode) }()
 
