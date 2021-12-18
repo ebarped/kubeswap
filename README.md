@@ -63,27 +63,31 @@ make clean build test
 ```
 - add:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap add --name test --kubeconfig test/kubeconfig.yml --db /tmp/test
+./dist/kubeswap_linux_amd64/kubeswap add --name test --kubeconfig test/kubeconfig.yml
 ```
 - list:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap list --db /tmp/test
+./dist/kubeswap_linux_amd64/kubeswap list
 ```
 - print:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap print -n test-0 --db /tmp/test
+./dist/kubeswap_linux_amd64/kubeswap print -n test-0
 ```
 - printall:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap printall --db /tmp/test
+./dist/kubeswap_linux_amd64/kubeswap printall
 ```
 - delete:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap delete -n test-0 --db /tmp/test
+./dist/kubeswap_linux_amd64/kubeswap delete -n test-0
+```
+- use:
+```bash
+./dist/kubeswap_linux_amd64/kubeswap use -n test-1
 ```
 
 ## TODO
-- Test in windows & linux
+- Test in windows & mac
 - use command:
   - use: prints a list of the keys and allows the user to select the desired kubeconfig
   - use -n \<name\>: modify current kubeconfig to the kubeconfig identified by name
@@ -93,6 +97,3 @@ make clean build test
 - Compress the db into a single file, to enable
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
-
-## Differences with other projects
-- [kubecm](https://github.com/sunny0826/kubecm): kubecm uses a single kubeconfig file, meanwhile this projects uses a key-value DB to store multiple kubeconfigs, but separated one from another. I use a lot of different kubeconfig files, and some of them are ephemeral (lifetime under 1 day), so it makes no point to merge them in a "master" kubeconfig.
