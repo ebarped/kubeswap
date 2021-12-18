@@ -16,7 +16,7 @@ Usage:
 
 Available Commands:
   add         Adds a new kubeconfig to the database
-  completion  generate the autocompletion script for the specified shell
+  completion  Generate completion script
   delete      Deletes a kubeconfig from the database
   help        Help about any command
   list        Lists all the kubeconfigs in the db
@@ -83,6 +83,7 @@ make clean build test
 ```
 
 ## TODO
+- Add shell completion
 - Test in windows & linux
 - use command:
   - use: prints a list of the keys and allows the user to select the desired kubeconfig
