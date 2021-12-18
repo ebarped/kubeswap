@@ -17,11 +17,13 @@ var printCMD = &cobra.Command{
 // init adds this command and his flags
 func init() {
 	rootCMD.AddCommand(printCMD)
-	printCMD.Flags().StringVarP(&name, "name", "n", "", "name of the kubeconfig")
+	printCMD.Flags().StringP("name", "n", "", "name of the kubeconfig")
 	printCMD.MarkFlagRequired("name")
 }
 
 func printFunc(cmd *cobra.Command, args []string) {
+	name, _ := cmd.Flags().GetString("name")
+
 	retcode := 0
 	defer func() { os.Exit(retcode) }()
 
