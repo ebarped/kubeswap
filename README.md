@@ -86,6 +86,11 @@ make clean build test
 ./dist/kubeswap_linux_amd64/kubeswap use -n test-1
 ```
 
+- use interactive:
+```bash
+./dist/kubeswap_linux_amd64/kubeswap use
+```
+
 ## TODO
 - Test in windows & mac
 - use command:
@@ -97,3 +102,4 @@ make clean build test
 - Compress the db into a single file, to enable
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
+- Move the complexity of the interactive list into an internal package
