@@ -2,100 +2,14 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/ebarped/kubeswap/internal/tui"
 	"github.com/ebarped/kubeswap/pkg/kv"
 	"github.com/spf13/cobra"
 )
-
-const listHeight = 14
-
-var (
-	titleStyle        = lipgloss.NewStyle().MarginLeft(2)
-	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
-	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("12"))
-	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
-	helpStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
-	quitTextStyle     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
-)
-
-type item string
-
-func (i item) FilterValue() string { return "" }
-
-type itemDelegate struct{}
-
-func (d itemDelegate) Height() int                               { return 1 }
-func (d itemDelegate) Spacing() int                              { return 0 }
-func (d itemDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd { return nil }
-func (d itemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(item)
-	if !ok {
-		return
-	}
-
-	str := fmt.Sprintf("%d. %s", index+1, i)
-
-	fn := itemStyle.Render
-	if index == m.Index() {
-		fn = func(s string) string {
-			return selectedItemStyle.Render("> " + s)
-		}
-	}
-
-	fmt.Fprintf(w, fn(str))
-}
-
-type model struct {
-	list     list.Model
-	items    []item
-	choice   string
-	quitting bool
-}
-
-func (m model) Init() tea.Cmd {
-	return nil
-}
-
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		m.list.SetWidth(msg.Width)
-		return m, nil
-
-	case tea.KeyMsg:
-		switch keypress := msg.String(); keypress {
-		case "ctrl+c":
-			m.quitting = true
-			return m, tea.Quit
-
-		case "enter":
-			i, ok := m.list.SelectedItem().(item)
-			if ok {
-				m.choice = string(i)
-			}
-			return m, tea.Quit
-		}
-	}
-
-	var cmd tea.Cmd
-	m.list, cmd = m.list.Update(msg)
-	return m, cmd
-}
-
-func (m model) View() string {
-	if m.choice != "" {
-		return quitTextStyle.Render(fmt.Sprintf("Selecting %s", m.choice))
-	}
-	if m.quitting {
-		return quitTextStyle.Render("Exiting...")
-	}
-	return "\n" + m.list.View()
-}
 
 var useCMD = &cobra.Command{
 	Use:   "use",
@@ -140,7 +54,7 @@ func useFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
-	log.Debug().Str("command", "use").Str("key", name).Str("result", "successful").Send()
+	log.Debug().Str("command", "use").Str("result", "successful").Send()
 }
 
 func useWithName(db *kv.DB, name, kubeconfigPath string) error {
@@ -167,25 +81,46 @@ func useWithoutName(db *kv.DB, kubeconfigPath string) error {
 		return err
 	}
 	for _, kc := range items {
-		listItems = append(listItems, item(kc.Name))
+		listItems = append(listItems, tui.Item(kc.Name))
 	}
 
 	const defaultWidth = 20
 
-	l := list.NewModel(listItems, itemDelegate{}, defaultWidth, listHeight)
+	l := list.NewModel(listItems, tui.ItemDelegate{}, defaultWidth, tui.ListHeight)
 	l.Title = "Select kubeconfig:"
 	l.SetShowStatusBar(false)
 	l.SetFilteringEnabled(false)
-	l.Styles.Title = titleStyle
-	l.Styles.PaginationStyle = paginationStyle
-	l.Styles.HelpStyle = helpStyle
+	l.Styles.Title = tui.TitleStyle
+	l.Styles.PaginationStyle = tui.PaginationStyle
+	l.Styles.HelpStyle = tui.HelpStyle
 
-	m := model{list: l}
-	if err := tea.NewProgram(m).Start(); err != nil {
+	// This is where we'll listen for the choice the user makes in the Bubble
+	// Tea program.
+	result := make(chan string, 1)
+
+	// we create a new model
+	// it has a list of items and a channel,
+	// so bubbletea can send the selected item outside its runtime
+	m := tui.NewModel(l, result)
+
+	// new program will take the model, and call Init,
+	// then Update and then View, and alternate between
+	// these 2 when an event (tea.Msg) is triggered (when something happens)
+	err = tea.NewProgram(m).Start()
+	if err != nil {
 		return fmt.Errorf("error creating TUI: %s", err)
 	}
 
-	fmt.Printf("%s\n", m.choice)
+	// Print out the final choice.
+	choice := <-result
+	if choice == "" {
+		return fmt.Errorf("the item is blank! Something bad has happened")
+	}
 
+	log.Debug().Str("command", "use").Str("with name", "false").Str("database", dbPath).Str("TUI - item selected", choice).Send()
+	err = useWithName(db, choice, kubeconfigPath)
+	if err != nil {
+		return err
+	}
 	return nil
 }
