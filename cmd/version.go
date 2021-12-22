@@ -3,9 +3,10 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/ebarped/kubeswap/internal/version"
 	"github.com/spf13/cobra"
 )
+
+var Version = "version is set by build process"
 
 func init() {
 	rootCMD.AddCommand(versionCMD)
@@ -18,5 +19,5 @@ var versionCMD = &cobra.Command{
 }
 
 func versionFunc(cmd *cobra.Command, args []string) {
-	fmt.Println("kubeswap " + version.Version)
+	fmt.Println("kubeswap " + Version)
 }
