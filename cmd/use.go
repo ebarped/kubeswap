@@ -37,6 +37,12 @@ func useFunc(cmd *cobra.Command, args []string) {
 	}
 	defer db.CloseDB()
 
+	if db.IsEmpty() {
+		log.Info().Msg("there are no kubeconfigs in the database. Exiting...")
+		retcode = 0
+		return
+	}
+
 	userHome, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal().Str("error", err.Error()).Msg("error getting the homeDir of the user")
@@ -84,7 +90,7 @@ func useWithoutName(db *kv.DB, kubeconfigPath string) error {
 		listItems = append(listItems, tui.Item(kc.Name))
 	}
 
-	const defaultWidth = 20
+	const defaultWidth = 30
 
 	l := list.NewModel(listItems, tui.ItemDelegate{}, defaultWidth, tui.ListHeight)
 	l.Title = "Select kubeconfig:"
@@ -113,14 +119,13 @@ func useWithoutName(db *kv.DB, kubeconfigPath string) error {
 
 	// Print out the final choice.
 	choice := <-result
-	if choice == "" {
-		return fmt.Errorf("the item is blank! Something bad has happened")
+	if choice != "" {
+		log.Debug().Str("command", "use").Str("with name", "false").Str("database", dbPath).Str("TUI - item selected", choice).Send()
+		err = useWithName(db, choice, kubeconfigPath)
+		if err != nil {
+			return err
+		}
 	}
 
-	log.Debug().Str("command", "use").Str("with name", "false").Str("database", dbPath).Str("TUI - item selected", choice).Send()
-	err = useWithName(db, choice, kubeconfigPath)
-	if err != nil {
-		return err
-	}
 	return nil
 }
