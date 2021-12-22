@@ -94,8 +94,7 @@ make clean build test
 ## TODO
 - Test in windows & mac
 - use command:
-  - use: prints a list of the keys and allows the user to select the desired kubeconfig
-  - use -n \<name\>: modify current kubeconfig to the kubeconfig identified by name
+  - exit early if db is empty
 - status command:
   - status: checks if the clusters referenced by each kubeconfig are reachable
     - \<name>\: checks if the cluster of \<name\> kubeconfig is reachable
