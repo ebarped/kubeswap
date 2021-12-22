@@ -3,6 +3,7 @@ Tool to manage multiple kubeconfig files and swap between clusters easily
 
 ```yaml
 
+
   ██   ██ ██    ██ ██████  ███████ ███████ ██     ██  █████  ██████  
   ██  ██  ██    ██ ██   ██ ██      ██      ██     ██ ██   ██ ██   ██ 
   █████   ██    ██ ██████  █████   ███████ ██  █  ██ ███████ ██████  
@@ -22,6 +23,7 @@ Available Commands:
   list        Lists all the kubeconfigs in the db
   print       Prints the content of the kubeconfig referenced by <name>
   printall    Prints the content of all the kubeconfigs from the db
+  use         Select kubeconfig to use
   version     Print the version number
 
 Flags:
@@ -35,28 +37,17 @@ Use "kubeswap [command] --help" for more information about a command.
 # Commands
 - kubeswap: displays the list of kubeconfigs in the db, same as subcommand use but without specifying a name
 
-## Subcommands
-- list: lists all the kubeconfigs
-- add -n \<name\> -f \<kubeconfig\>: adds a new kubeconfig identified as \<name\> from \<kubeconfig\> file to the db
-- delete -n \<name\>: removes a kubeconfig from the db
-- use -n \<name\>: modify current kubeconfig to the kubeconfig identified by name
-- print -n \<name\>: print the kubeconfig identified by name
-- printall: prints all the kubeconfig from the db
-- status: checks if the clusters referenced by each kubeconfig are reachable
-  - \<name>\: checks if the cluster of the \<name\> kubeconfig is reachable
-
 ## Tip
 I like to create an alias to kubeswap:
 `alias ks=kubeswap`
 
 ## Technologies
 - cobra: cli library
-- fzf: fuzzy finding to enable more easisly
 - pogreb: key-value database to store the files
 - zerolog: structured (and fast) logger
+- bubbletea: 
 
-
-## Test
+## Quickstart (test basic usage)
 - Init:
 ```bash
 make clean build test
@@ -85,7 +76,6 @@ make clean build test
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap use -n test-1
 ```
-
 - use interactive:
 ```bash
 ./dist/kubeswap_linux_amd64/kubeswap use
@@ -93,12 +83,10 @@ make clean build test
 
 ## TODO
 - Test in windows & mac
-- use command:
-  - exit early if db is empty
 - status command:
   - status: checks if the clusters referenced by each kubeconfig are reachable
     - \<name>\: checks if the cluster of \<name\> kubeconfig is reachable
 - Compress the db into a single file, to enable
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
-- Move the complexity of the interactive list into an internal package
+- Move all the complexity of the interactive list into the tui internal package
