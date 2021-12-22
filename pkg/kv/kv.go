@@ -104,3 +104,7 @@ func (kv *DB) GetAll() ([]kubeconfig.Kubeconfig, error) {
 	}
 	return items, nil
 }
+
+func (kv *DB) IsEmpty() bool {
+	return kv.Count() == 0
+}
