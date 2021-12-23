@@ -33,39 +33,67 @@ Flags:
 
 Use "kubeswap [command] --help" for more information about a command.
 ```
+## Why kubeswap
+If you interact with a lot of kubernetes clusters/contexts, and you dont want to manage it in a big single kubeconfig file (merging kubeconfigs is tedious...), this is the right tool for you!
+
+Just throw your kubeconfig files inside `$HOME/.kube`, and kubeswap will manage it for you.
+
+## Basic usage
+Basically, you will use 2 commands:
+- **kubeswap**: scans your `$HOME/.kube` dir and shows you a pretty interactive list to choose the desired kubeconfig
+- **kubeswap** \<name\>: directly will select the kubeconfig with that name from your `$HOME/.kube` dir
+
+## Advanced usage
+Besides the basic usage, i have embedded an key-value store, so you can:
+- Add/delete kubeconfigs to/from the db
+- List the kubeconfigs stored
+- Select one to use
+- ...
+
+I have done this with 2 motives:
+- Portability: you can use this db to store all your kubeconfigs and carry them with you
+- Backup/Restore: we can use the db to backup/restore the kubeconfigs
+
+To use the store, check the help :)
+
+## Tips
+Use some shell/program that shows you your current k8s cluster/context.
 
 ## Quickstart (test basic usage)
-- Init:
+Basic: (without store)
+- Interactive list:
 ```bash
-make clean build test
+kubeswap
 ```
+- Select one kubeconfig from your `$HOME/.kube` directory:
+```bash
+kubeswap \<filename\>
+```
+
+Advanced: (with store)
 - add:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap add --name test --kubeconfig test/kubeconfig.yml
+kubeswap add --name test --kubeconfig test/kubeconfig.yml --db /tmp/kubeswap.db
 ```
 - list:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap list
+kubeswap list --db /tmp/kubeswap.db
 ```
 - print:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap print -n test-0
+kubeswap print -n test --db /tmp/kubeswap.db
 ```
 - printall:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap printall
-```
-- delete:
-```bash
-./dist/kubeswap_linux_amd64/kubeswap delete -n test-0
+kubeswap printall --db /tmp/kubeswap.db
 ```
 - use:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap use -n test-1
+kubeswap use -n test --db /tmp/kubeswap.db
 ```
-- use interactive:
+- delete:
 ```bash
-./dist/kubeswap_linux_amd64/kubeswap use
+kubeswap delete -n test --db /tmp/kubeswap.db
 ```
 
 ## TODO
