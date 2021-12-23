@@ -19,7 +19,7 @@ import (
 // variables to store the rootCMD flags
 var (
 	logLevel  string
-	kcRootDir string
+	kcRootDir string // rootDir of the default kubeconfig location ($HOME/.kube/)
 	dbPath    string // path to the db file
 )
 
@@ -29,15 +29,8 @@ var log *zerolog.Logger
 // adds all the flags of the root command
 // persistentFlags are the ones that are common to all subcommands
 func init() {
-	userHome, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal().Str("error", err.Error()).Msg("error getting the homeDir of the user")
-	}
-	dbPath = userHome + "/.kube/kubeswap.db"
-
 	rootCMD.PersistentFlags().StringVar(&logLevel, "loglevel", "info", "loglevel (info/debug)")
 	rootCMD.PersistentFlags().StringVar(&dbPath, "db", "$HOME/.kube/kubeswap.db", "db file path")
-
 }
 
 // execute common initial steps
@@ -77,7 +70,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	}
 	kcRootDir = userHome + "/.kube/"
 
-	// we have a name arg, use that as kubeconfig
+	// we have a name arg, use that as filename to select the kubeconfig
 	if len(args) == 1 {
 		name := args[0]
 		path := kcRootDir + name
@@ -97,7 +90,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		log.Debug().Str("name", name).Str("path", path).Msg("kubeconfig successfully loaded")
 		return
 	}
-
+	// we dont have the filename arg, so we scan the $HOME/.kube/ directory
 	files, err := ioutil.ReadDir(kcRootDir)
 	if err != nil {
 		log.Error().Msg(err.Error())
@@ -130,8 +123,8 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	l.Styles.PaginationStyle = tui.PaginationStyle
 	l.Styles.HelpStyle = tui.HelpStyle
 
-	// This is where we'll listen for the choice the user makes in the Bubble
-	// Tea program.
+	// this is where we'll listen for the choice the user
+	// makes in the BubbleTea program.
 	result := make(chan string, 1)
 
 	// we create a new model
@@ -139,7 +132,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	// so bubbletea can send the selected item outside its runtime
 	m := tui.NewModel(l, result)
 
-	// new program will take the model, and call Init,
+	// newProgram will take the model, and call Init,
 	// then Update and then View, and alternate between
 	// these 2 when an event (tea.Msg) is triggered (when something happens)
 	err = tea.NewProgram(m).Start()
@@ -149,22 +142,25 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Print out the final choice.
+	// Once the BubbleTeam runtime is done, we receive here the choice
 	choice := <-result
-	if choice != "" {
-		kc, err := kubeconfig.New(choice, kcRootDir+choice)
-		if err != nil {
-			log.Error().Str("file", kc.Name).Msg(err.Error())
-			retcode = 1
-			return
-		}
+	if choice == "" {
+		log.Debug().Msg("exit without selecting any item")
+		return
+	}
 
-		err = useKubeconfig(kc)
-		if err != nil {
-			log.Error().Str("file", kc.Name).Msg(err.Error())
-			retcode = 1
-			return
-		}
+	kc, err := kubeconfig.New(choice, kcRootDir+choice)
+	if err != nil {
+		log.Error().Str("file", kc.Name).Msg(err.Error())
+		retcode = 1
+		return
+	}
+
+	err = useKubeconfig(kc)
+	if err != nil {
+		log.Error().Str("file", kc.Name).Msg(err.Error())
+		retcode = 1
+		return
 	}
 }
 
