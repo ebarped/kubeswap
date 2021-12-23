@@ -38,7 +38,6 @@ func init() {
 	rootCMD.PersistentFlags().StringVar(&logLevel, "loglevel", "info", "loglevel (info/debug)")
 	rootCMD.PersistentFlags().StringVar(&dbPath, "db", "$HOME/.kube/kubeswap.db", "db file path")
 
-	rootCMD.AddCommand(completionCmd)
 }
 
 // execute common initial steps
@@ -107,10 +106,15 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	var listItems []list.Item
 
 	for _, f := range files {
-		log.Debug().Msgf("loading kubeconfig %s from %s", f.Name(), kcRootDir+f.Name())
+		log.Debug().Str("file", f.Name()).Str("path", kcRootDir+f.Name()).Msg("loading kubeconfig...")
+		// skip the default kubeconfig
+		if f.Name() == "config" {
+			log.Debug().Str("file", f.Name()).Msg("skipping default kubeconfig")
+			continue
+		}
 		kc, err := kubeconfig.New(f.Name(), kcRootDir+f.Name())
 		if err != nil {
-			log.Error().Str("file", f.Name()).Msg(err.Error())
+			log.Debug().Str("file", f.Name()).Msg("not a valid kubeconfig")
 			continue
 		}
 		listItems = append(listItems, tui.Item(kc.Name))
