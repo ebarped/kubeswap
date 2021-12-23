@@ -43,7 +43,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// if the user inputs some key
 	case tea.KeyMsg:
 		switch keypress := msg.String(); keypress {
-		case "ctrl+c":
+		case "ctrl+c", "q":
 			close(m.choice)
 			m.quitting = true
 			return m, tea.Quit
