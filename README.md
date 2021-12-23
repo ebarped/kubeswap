@@ -67,7 +67,7 @@ Basic (without store):
 ```bash
 kubeswap
 ```
-- Select one kubeconfig from your `$HOME/.kube` directory:
+- Select one kubeconfig from your `$HOME/.kube/` directory:
 ```bash
 kubeswap <filename>
 ```
