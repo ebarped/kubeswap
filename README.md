@@ -1,8 +1,31 @@
 # Kubeswap
 Tool to manage multiple kubeconfig files and swap between clusters easily
 
-```yaml
+## Why kubeswap
+If you interact with a lot of kubernetes clusters/contexts, and you dont want to manage it in a big single kubeconfig file (merging kubeconfigs is tedious...), this is the right tool for you!
 
+Just throw your kubeconfig files inside `$HOME/.kube`, and kubeswap will manage it for you.
+
+## Basic usage
+Basically, you will use 2 commands:
+- **kubeswap**: scans your `$HOME/.kube` dir and shows you a pretty interactive list to choose the desired kubeconfig
+- **kubeswap** \<name\>: directly select the kubeconfig with that name from your `$HOME/.kube` dir
+
+## Advanced usage
+Besides the basic usage, kubeswap has and an key-value store, so you can:
+- Add/delete kubeconfigs to/from the db
+- List the kubeconfigs stored
+- Select one to use
+- Much more... (not really)
+
+I have implemented the store this with 2 objectives:
+- Portability: you can use this db to store all your kubeconfigs and carry them with you
+- Backup/Restore: you can use the db to backup/restore the kubeconfigs
+
+To use the store, check the help :)
+
+## Help
+```yaml
 
   ██   ██ ██    ██ ██████  ███████ ███████ ██     ██  █████  ██████  
   ██  ██  ██    ██ ██   ██ ██      ██      ██     ██ ██   ██ ██   ██ 
@@ -13,11 +36,12 @@ Tool to manage multiple kubeconfig files and swap between clusters easily
 Manage your kubeconfig files easily
 
 Usage:
+  kubeswap [flags]
   kubeswap [command]
 
 Available Commands:
   add         Adds a new kubeconfig to the database
-  completion  Generate completion script
+  completion  Generate the autocompletion script for the specified shell
   delete      Deletes a kubeconfig from the database
   help        Help about any command
   list        Lists all the kubeconfigs in the db
@@ -33,34 +57,12 @@ Flags:
 
 Use "kubeswap [command] --help" for more information about a command.
 ```
-## Why kubeswap
-If you interact with a lot of kubernetes clusters/contexts, and you dont want to manage it in a big single kubeconfig file (merging kubeconfigs is tedious...), this is the right tool for you!
-
-Just throw your kubeconfig files inside `$HOME/.kube`, and kubeswap will manage it for you.
-
-## Basic usage
-Basically, you will use 2 commands:
-- **kubeswap**: scans your `$HOME/.kube` dir and shows you a pretty interactive list to choose the desired kubeconfig
-- **kubeswap** \<name\>: directly will select the kubeconfig with that name from your `$HOME/.kube` dir
-
-## Advanced usage
-Besides the basic usage, i have embedded an key-value store, so you can:
-- Add/delete kubeconfigs to/from the db
-- List the kubeconfigs stored
-- Select one to use
-- ...
-
-I have done this with 2 motives:
-- Portability: you can use this db to store all your kubeconfigs and carry them with you
-- Backup/Restore: we can use the db to backup/restore the kubeconfigs
-
-To use the store, check the help :)
 
 ## Tips
 Use some shell/program that shows you your current k8s cluster/context.
 
-## Quickstart (test basic usage)
-Basic: (without store)
+## Quickstart
+Basic (without store):
 - Interactive list:
 ```bash
 kubeswap
@@ -70,7 +72,7 @@ kubeswap
 kubeswap \<filename\>
 ```
 
-Advanced: (with store)
+Advanced (with store):
 - add:
 ```bash
 kubeswap add --name test --kubeconfig test/kubeconfig.yml --db /tmp/kubeswap.db
@@ -104,12 +106,5 @@ kubeswap delete -n test --db /tmp/kubeswap.db
 - Compress the db into a single file, to enable
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
-- Move all the complexity of the interactive list into the tui internal package
 - Cleanup! like a lot...
 - Performance (we can just copy files if we know the name, not creating a kubeconfig.Kubeconfig etc etc...)
-
-# Simplify?
-Maybe just have 2 commands:
-- kubeswap: get all the kubeconfigs from $HOME/.kube, show the list and let you select one
-- kubeswap <name>: use the kubeconfig referenced by filename
-- Later we can expand adding the db to backup/restore and easily move all kubeconfigs from one machine to another
