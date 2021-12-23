@@ -77,6 +77,8 @@ make clean build test
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
 - Move all the complexity of the interactive list into the tui internal package
+- Cleanup! like a lot...
+- Performance (we can just copy files if we know the name, not creating a kubeconfig.Kubeconfig etc etc...)
 
 # Simplify?
 Maybe just have 2 commands:
