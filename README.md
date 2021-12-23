@@ -70,8 +70,6 @@ make clean build test
 
 ## TODO
 - Test in windows & mac
-- load command:
-  - -d \<dir_path\>: takes all valid kubeconfigs from a directory and loads them into the db, using the filename as the name of the kubeconfig in the db
 - status command:
   - status: checks if the clusters referenced by each kubeconfig are reachable
     - -n \<name>\: checks if the cluster of \<name\> kubeconfig is reachable
