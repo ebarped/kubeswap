@@ -34,19 +34,6 @@ Flags:
 Use "kubeswap [command] --help" for more information about a command.
 ```
 
-# Commands
-- kubeswap: displays the list of kubeconfigs in the db, same as subcommand use but without specifying a name
-
-## Tip
-I like to create an alias to kubeswap:
-`alias ks=kubeswap`
-
-## Technologies
-- cobra: cli library
-- pogreb: key-value database to store the files
-- zerolog: structured (and fast) logger
-- bubbletea: 
-
 ## Quickstart (test basic usage)
 - Init:
 ```bash
@@ -83,10 +70,18 @@ make clean build test
 
 ## TODO
 - Test in windows & mac
+- load command:
+  - -d \<dir_path\>: takes all valid kubeconfigs from a directory and loads them into the db, using the filename as the name of the kubeconfig in the db
 - status command:
   - status: checks if the clusters referenced by each kubeconfig are reachable
-    - \<name>\: checks if the cluster of \<name\> kubeconfig is reachable
+    - -n \<name>\: checks if the cluster of \<name\> kubeconfig is reachable
 - Compress the db into a single file, to enable
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
 - Move all the complexity of the interactive list into the tui internal package
+
+# Simplify?
+Maybe just have 2 commands:
+- kubeswap: get all the kubeconfigs from $HOME/.kube, show the list and let you select one
+- kubeswap <name>: use the kubeconfig referenced by filename
+- Later we can expand adding the db to backup/restore and easily move all kubeconfigs from one machine to another
