@@ -53,6 +53,15 @@ var rootCMD = &cobra.Command{
 	Long:             printLogo(),
 	PersistentPreRun: initConfig,
 	Run:              rootFunc,
+	Args:             validateArgs,
+}
+
+func validateArgs(cmd *cobra.Command, args []string) error {
+	// probably i can do better :rofl:
+	if len(args) != 0 && len(args) != 1 {
+		return fmt.Errorf("invalid number of args")
+	}
+	return nil
 }
 
 func rootFunc(cmd *cobra.Command, args []string) {
@@ -64,6 +73,27 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		log.Fatal().Str("error", err.Error()).Msg("error getting the homeDir of the user")
 	}
 	kcRootDir = userHome + "/.kube/"
+
+	// we have a name arg, use that as kubeconfig
+	if len(args) == 1 {
+		name := args[0]
+		path := kcRootDir + name
+		log.Debug().Str("name", name).Str("path", path).Msgf("loading kubeconfig...")
+		kc, err := kubeconfig.New(name, path)
+		if err != nil {
+			log.Error().Str("name", name).Str("path", path).Str("error", err.Error()).Msg("error loading kubeconfig")
+			retcode = 1
+			return
+		}
+		err = useKubeconfig(kc)
+		if err != nil {
+			log.Error().Str("name", name).Str("path", path).Str("error", err.Error()).Msg("error selecting kubeconfig")
+			retcode = 1
+			return
+		}
+		log.Debug().Str("name", name).Str("path", path).Msg("kubeconfig successfully loaded")
+		return
+	}
 
 	files, err := ioutil.ReadDir(kcRootDir)
 	if err != nil {
@@ -79,7 +109,6 @@ func rootFunc(cmd *cobra.Command, args []string) {
 			log.Error().Str("file", f.Name()).Msg(err.Error())
 			continue
 		}
-		fmt.Println(kc.Name)
 		listItems = append(listItems, tui.Item(kc.Name))
 	}
 
@@ -115,15 +144,12 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	// Print out the final choice.
 	choice := <-result
 	if choice != "" {
-		fmt.Printf("choice: %s\n", choice)
-		fmt.Printf("path: %s\n", kcRootDir+choice)
 		kc, err := kubeconfig.New(choice, kcRootDir+choice)
 		if err != nil {
 			log.Error().Str("file", kc.Name).Msg(err.Error())
 			retcode = 1
 			return
 		}
-		fmt.Printf("%#v\n", kc)
 
 		err = useKubeconfig(kc)
 		if err != nil {
