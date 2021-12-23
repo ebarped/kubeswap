@@ -30,7 +30,7 @@ var log *zerolog.Logger
 // persistentFlags are the ones that are common to all subcommands
 func init() {
 	rootCMD.PersistentFlags().StringVar(&logLevel, "loglevel", "info", "loglevel (info/debug)")
-	rootCMD.PersistentFlags().StringVar(&dbPath, "db", "$HOME/.kube/kubeswap.db", "db file path")
+	rootCMD.PersistentFlags().StringVar(&dbPath, "db", "$HOME/.kube/kubeswap.db", "db path")
 }
 
 // execute common initial steps
