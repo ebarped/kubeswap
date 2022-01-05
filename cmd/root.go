@@ -75,6 +75,18 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		name := args[0]
 		path := kcRootDir + name
 		log.Debug().Str("name", name).Str("path", path).Msgf("loading kubeconfig...")
+
+		// "deselect" kubeconfig
+		if name == "none" {
+			err := deleteDefaultKubeconfig()
+			if err != nil {
+				log.Error().Str("name", "none").Str("path", path).Str("error", err.Error()).Msg("error setting kubeconfig to none...")
+				retcode = 1
+			}
+			retcode = 0
+			return
+		}
+
 		kc, err := kubeconfig.New(name, path)
 		if err != nil {
 			log.Error().Str("name", name).Str("path", path).Str("error", err.Error()).Msg("error loading kubeconfig")
@@ -162,6 +174,21 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
+}
+
+func deleteDefaultKubeconfig() error {
+	path := kcRootDir + "config"
+
+	_, err := os.Stat(path)
+	if err != nil {
+		// .kube/config does not exist, just exit
+		return nil
+	}
+	err = os.Remove(path)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func useKubeconfig(kc *kubeconfig.Kubeconfig) error {
