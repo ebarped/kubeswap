@@ -106,5 +106,6 @@ kubeswap delete -n test --db /tmp/kubeswap.db
 - Compress the db into a single file, to enable
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
+- Refine the TUI list to show only the important stuff (remove '?' option for example)
 - Cleanup! like a lot...
 - Performance (we can just copy files if we know the name, not creating a kubeconfig.Kubeconfig etc etc...)

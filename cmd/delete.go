@@ -34,7 +34,7 @@ func deleteFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
-	defer db.CloseDB()
+	defer db.Close()
 
 	log.Debug().Str("action", "delete kubeconfig from db").Str("key", name).Send()
 

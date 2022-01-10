@@ -35,7 +35,7 @@ func useFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
-	defer db.CloseDB()
+	defer db.Close()
 
 	if db.IsEmpty() {
 		log.Info().Msg("there are no kubeconfigs in the database. Exiting...")

@@ -29,7 +29,7 @@ func printallFunc(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Error().Str("error", err.Error()).Msg("error opening kv database")
 	}
-	defer db.CloseDB()
+	defer db.Close()
 
 	items, err := db.GetAll()
 	if err != nil {
