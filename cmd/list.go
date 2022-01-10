@@ -31,7 +31,7 @@ func listFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
-	defer db.CloseDB()
+	defer db.Close()
 
 	var list []pterm.BulletListItem
 

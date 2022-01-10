@@ -45,7 +45,7 @@ func addFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
-	defer db.CloseDB()
+	defer db.Close()
 
 	log.Debug().Str("action", "adding new kubeconfig to the database").Str("key", kc.Name).Str("value", kc.Content).Send()
 

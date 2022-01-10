@@ -11,7 +11,7 @@ import (
 )
 
 type DB struct {
-	*pogreb.DB
+	db *pogreb.DB
 }
 
 func Open(path string) (*DB, error) {
@@ -25,17 +25,17 @@ func Open(path string) (*DB, error) {
 	return &DB{db}, nil
 }
 
-func (kv *DB) CloseDB() {
+func (kv *DB) Close() {
 	// this should:
 	// - compress the real database folder into a single file
-	err := kv.Close()
+	err := kv.db.Close()
 	if err != nil {
 		log.Fatalf("error closing db: %s", err)
 	}
 }
 
 func (kv *DB) GetKubeconfig(key string) (*kubeconfig.Kubeconfig, error) {
-	exist, err := kv.Has([]byte(key))
+	exist, err := kv.db.Has([]byte(key))
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func (kv *DB) GetKubeconfig(key string) (*kubeconfig.Kubeconfig, error) {
 		return nil, fmt.Errorf("key does not exist in the db: %s", key)
 	}
 
-	val, err := kv.Get([]byte(key))
+	val, err := kv.db.Get([]byte(key))
 	if err != nil {
 		return nil, err
 	}
@@ -54,7 +54,7 @@ func (kv *DB) GetKubeconfig(key string) (*kubeconfig.Kubeconfig, error) {
 }
 
 func (kv *DB) PutKubeconfig(key string, value []byte) error {
-	exist, err := kv.Has([]byte(key))
+	exist, err := kv.db.Has([]byte(key))
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (kv *DB) PutKubeconfig(key string, value []byte) error {
 		return fmt.Errorf("key already exists in the db: %s", key)
 	}
 
-	err = kv.Put([]byte(key), value)
+	err = kv.db.Put([]byte(key), value)
 	if err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (kv *DB) PutKubeconfig(key string, value []byte) error {
 }
 
 func (kv *DB) DeleteKubeconfig(key string) error {
-	exist, err := kv.Has([]byte(key))
+	exist, err := kv.db.Has([]byte(key))
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (kv *DB) DeleteKubeconfig(key string) error {
 		return fmt.Errorf("key does not exist in the db: %s", key)
 	}
 
-	err = kv.Delete([]byte(key))
+	err = kv.db.Delete([]byte(key))
 	if err != nil {
 		return err
 	}
@@ -87,7 +87,7 @@ func (kv *DB) DeleteKubeconfig(key string) error {
 
 func (kv *DB) GetAll() ([]kubeconfig.Kubeconfig, error) {
 	var items []kubeconfig.Kubeconfig
-	it := kv.Items()
+	it := kv.db.Items()
 	for {
 		key, val, err := it.Next()
 		if err == pogreb.ErrIterationDone {
@@ -106,5 +106,5 @@ func (kv *DB) GetAll() ([]kubeconfig.Kubeconfig, error) {
 }
 
 func (kv *DB) IsEmpty() bool {
-	return kv.Count() == 0
+	return kv.db.Count() == 0
 }
