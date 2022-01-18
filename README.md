@@ -12,7 +12,7 @@ Basically, you will use 2 commands:
 - **kubeswap \<name\>**: directly select the kubeconfig with that name from your `$HOME/.kube/` dir
 
 ## Advanced usage
-Besides the basic usage, kubeswap has and an key-value store, so you can:
+Besides the basic usage, kubeswap has and a key-value store, so you can:
 - Add/delete kubeconfigs to/from the db
 - List the kubeconfigs stored
 - Select one to use
