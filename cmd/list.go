@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/ebarped/kubeswap/pkg/kv"
@@ -39,6 +40,12 @@ func listFunc(cmd *cobra.Command, args []string) {
 	if err != nil {
 		log.Error().Str("error", err.Error()).Msg("error listing items from database")
 		retcode = 1
+		return
+	}
+
+	if len(items) == 0 {
+		fmt.Println("Empty db...")
+		retcode = 0
 		return
 	}
 
