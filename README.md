@@ -11,6 +11,8 @@ Basically, you will use 2 commands:
 - **kubeswap**: scans your `$HOME/.kube` dir and shows you a pretty interactive list to choose the desired kubeconfig
 - **kubeswap \<name\>**: directly select the kubeconfig with that name from your `$HOME/.kube/` dir
 
+- Extra: `kubeswap none` will remove the current **kubeconfig**.
+
 ## Advanced usage
 Besides the basic usage, kubeswap has a key-value store, so you can:
 - Add/delete kubeconfigs to/from the db
@@ -19,8 +21,8 @@ Besides the basic usage, kubeswap has a key-value store, so you can:
 - Much more... (not really)
 
 I have implemented the store with 2 objectives:
-- Portability: you can use this db to store all your kubeconfigs and carry them with you
-- Backup/Restore: you can use the db to backup/restore the kubeconfigs
+- **Portability**: you can use this db to store all your kubeconfigs and carry them with you
+- **Backup/Restore**: you can use the db to backup/restore the kubeconfigs
 
 To use the store, check the help :)
 
@@ -47,11 +49,12 @@ Available Commands:
   list        Lists all the kubeconfigs in the db
   print       Prints the content of the kubeconfig referenced by <name>
   printall    Prints the content of all the kubeconfigs from the db
+  sync        Removes the current db file and recreates it with all the $HOME/.kube kubeconfigs
   use         Select kubeconfig to use
   version     Print the version number
 
 Flags:
-      --db string         db file path (default "$HOME/.kube/kubeswap.db")
+      --db string         db path (default "$HOME/.kube/kubeswap.db")
   -h, --help              help for kubeswap
       --loglevel string   loglevel (info/debug) (default "info")
 
