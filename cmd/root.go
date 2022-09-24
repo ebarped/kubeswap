@@ -74,10 +74,10 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	if len(args) == 1 {
 		name := args[0]
 		path := kcRootDir + name
-		log.Debug().Str("name", name).Str("path", path).Msgf("loading kubeconfig...")
 
 		// "deselect" kubeconfig
 		if name == "none" {
+			log.Debug().Str("name", name).Str("path", path).Msgf("removing default kubeconfig")
 			err := deleteDefaultKubeconfig()
 			if err != nil {
 				log.Error().Str("name", "none").Str("path", path).Str("error", err.Error()).Msg("error setting kubeconfig to none...")
@@ -87,6 +87,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 			return
 		}
 
+		log.Debug().Str("name", name).Str("path", path).Msgf("loading kubeconfig...")
 		kc, err := kubeconfig.New(name, path)
 		if err != nil {
 			log.Error().Str("name", name).Str("path", path).Str("error", err.Error()).Msg("error loading kubeconfig")
