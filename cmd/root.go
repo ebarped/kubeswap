@@ -106,7 +106,13 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	// we dont have the filename arg, so we scan the $HOME/.kube/ directory
 	files, err := ioutil.ReadDir(kcRootDir)
 	if err != nil {
-		log.Error().Msg(err.Error())
+		log.Fatal().Msg(err.Error())
+	}
+
+	// check if we have any kubeconfig to list
+	if len(files) == 0 {
+		log.Info().Str("path", kcRootDir).Msg("Seems that you dont have any kubeconfig files ...")
+		os.Exit(0)
 	}
 
 	var listItems []list.Item
