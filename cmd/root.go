@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 
 	"github.com/charmbracelet/bubbles/list"
@@ -104,7 +103,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		return
 	}
 	// we dont have the filename arg, so we scan the $HOME/.kube/ directory
-	files, err := ioutil.ReadDir(kcRootDir)
+	files, err := os.ReadDir(kcRootDir)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
@@ -142,14 +141,10 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	l.Styles.PaginationStyle = tui.PaginationStyle
 	l.Styles.HelpStyle = tui.HelpStyle
 
-	// this is where we'll listen for the choice the user
-	// makes in the BubbleTea program.
-	result := make(chan string, 1)
-
 	// we create a new model
 	// it has a list of items and a channel,
 	// so bubbletea can send the selected item outside its runtime
-	m := tui.NewModel(l, result)
+	m := tui.NewModel(l)
 
 	// newProgram will take the model, and call Init,
 	// then Update and then View, and alternate between
@@ -162,13 +157,12 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	}
 
 	// Once the BubbleTeam runtime is done, we receive here the choice
-	choice := <-result
-	if choice == "" {
+	if m.Choice == "" {
 		log.Debug().Msg("exit without selecting any item")
 		return
 	}
 
-	kc, err := kubeconfig.New(choice, kcRootDir+choice)
+	kc, err := kubeconfig.New(m.Choice, kcRootDir+m.Choice)
 	if err != nil {
 		log.Error().Str("file", kc.Name).Msg(err.Error())
 		retcode = 1
