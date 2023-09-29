@@ -3,7 +3,7 @@
 
 build: # @HELP builds for current GOOS/GOARCH
 build:
-	@goreleaser build --snapshot --single-target --skip-validate
+	@goreleaser build --snapshot --single-target --skip=validate
 
 snapshot: # @HELP generate a snapshot for all OS_ARCH combinations
 snapshot:

@@ -5,7 +5,8 @@ before:
     - rm -rf dist
     - gofumpt -l -w .
 builds:
-  - env:
+  - binary: kubeswap
+    env:
       - CGO_ENABLED=0
     goos:
       - darwin
@@ -31,12 +32,6 @@ archives:
   - format_overrides:
     - goos: windows
       format: zip
-    replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
 release:
 snapshot:
   name_template: "{{ .Tag }}-next"

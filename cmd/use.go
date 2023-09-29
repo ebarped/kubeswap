@@ -100,14 +100,10 @@ func useWithoutName(db *kv.DB, kubeconfigPath string) error {
 	l.Styles.PaginationStyle = tui.PaginationStyle
 	l.Styles.HelpStyle = tui.HelpStyle
 
-	// This is where we'll listen for the choice the user makes in the Bubble
-	// Tea program.
-	result := make(chan string, 1)
-
 	// we create a new model
 	// it has a list of items and a channel,
 	// so bubbletea can send the selected item outside its runtime
-	m := tui.NewModel(l, result)
+	m := tui.NewModel(l)
 
 	// new program will take the model, and call Init,
 	// then Update and then View, and alternate between
@@ -118,10 +114,9 @@ func useWithoutName(db *kv.DB, kubeconfigPath string) error {
 	}
 
 	// Print out the final choice.
-	choice := <-result
-	if choice != "" {
-		log.Debug().Str("command", "use").Str("with name", "false").Str("database", dbPath).Str("TUI - item selected", choice).Send()
-		err = useWithName(db, choice, kubeconfigPath)
+	if m.Choice != "" {
+		log.Debug().Str("command", "use").Str("with name", "false").Str("database", dbPath).Str("TUI - item selected", m.Choice).Send()
+		err = useWithName(db, m.Choice, kubeconfigPath)
 		if err != nil {
 			return err
 		}
