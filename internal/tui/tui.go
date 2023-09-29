@@ -1,61 +1,53 @@
 package tui
 
 import (
-	"fmt"
-	"io"
-
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
-var (
-	TitleStyle        = lipgloss.NewStyle().MarginLeft(2)
-	itemStyle         = lipgloss.NewStyle().PaddingLeft(4)
-	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("12"))
-	PaginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
-	HelpStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
-	quitTextStyle     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
+const (
+	defaultWidth  = 30
+	defaultHeight = 30
 )
 
-type Item string
+var appStyle = lipgloss.NewStyle().Padding(1, 2)
 
-func (i Item) FilterValue() string { return "" }
-
-type ItemDelegate struct{}
-
-func (d ItemDelegate) Height() int                               { return 1 }
-func (d ItemDelegate) Spacing() int                              { return 0 }
-func (d ItemDelegate) Update(msg tea.Msg, m *list.Model) tea.Cmd { return nil }
-func (d ItemDelegate) Render(w io.Writer, m list.Model, index int, listItem list.Item) {
-	i, ok := listItem.(Item)
-	if !ok {
-		return
-	}
-
-	str := fmt.Sprintf("%d. %s", index+1, i)
-
-	fn := itemStyle.Render
-	if index == m.Index() {
-		fn = func(s string) string {
-			return selectedItemStyle.Render("> " + s)
-		}
-	}
-
-	fmt.Fprintf(w, fn(str))
+type item struct {
+	title   string // title showed in list
+	context string // NOT_IMPLEMENTED: context obtained from the kubeconfig
 }
+
+func NewItem(title, context string) item {
+	return item{
+		title:   title,
+		context: context,
+	}
+}
+
+func (i item) Title() string       { return i.title }
+func (i item) Description() string { return i.context }
+func (i item) FilterValue() string { return i.title } // field used to filter
 
 // Model defines the model to show
 // in this case, it has a list of items, a selected item (choice) and a flag to quit
 type Model struct {
-	list     list.Model
-	Choice   string
-	quitting bool
+	list   list.Model // list of items
+	keys   KeyMap     // custom keys to accept
+	Choice string     // selected item
 }
 
-func NewModel(l list.Model) *Model {
+func NewModel(items []list.Item) *Model {
+	// setup list
+	l := list.New(items, newListDelegate(Keys), defaultWidth, defaultHeight)
+	l.Title = "⎈ Select kubeconfig⎈"
+	l.Styles.Title = lipgloss.NewStyle().Foreground(lipgloss.Color("#038cfc")).Padding(0, 1).Bold(true)
+	l.SetFilteringEnabled(true) // enable filtering using Item.FilterValue()
+
 	return &Model{
 		list: l,
+		keys: Keys,
 	}
 }
 
@@ -71,48 +63,36 @@ func (m Model) Init() tea.Cmd {
 // and will exec the loop
 func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	// needed so the framework can render the list
+	case tea.WindowSizeMsg:
+		h, v := appStyle.GetFrameSize()
+		m.list.SetSize(msg.Width-h, msg.Height-v)
+
 	// if the user inputs some key
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c", "q":
-			m.quitting = true
-			return m, tea.Quit
-
-		case "enter":
-			i, ok := m.list.SelectedItem().(Item)
+		// Don't match any of the keys below if we're actively filtering.
+		if m.list.FilterState() == list.Filtering {
+			break
+		}
+		switch {
+		case key.Matches(msg, m.keys.SelectItem):
+			i, ok := m.list.SelectedItem().(item)
 			if ok {
-				m.Choice = string(i)
+				m.Choice = i.title
 			}
 			return m, tea.Quit
 		}
-	// if there is an error
-	case ErrMsg:
-		return m, nil
 	}
-	// handle the default keys
+
+	// update the model
 	var cmd tea.Cmd
 	m.list, cmd = m.list.Update(msg)
+
 	return m, cmd
 }
 
 // View method renders the model into the console
 // in this case, calls the View method of the list inside my custom model
 func (m Model) View() string {
-	if m.Choice != "" {
-		return quitTextStyle.Render(fmt.Sprintf("Selecting %s", m.Choice))
-	}
-	if m.quitting {
-		return quitTextStyle.Render("Exiting...")
-	}
-	return "\n" + m.list.View()
-}
-
-const ListHeight = 14
-
-type ErrMsg struct{ err error }
-
-func NewErrMsg(err error) *ErrMsg {
-	return &ErrMsg{
-		err: err,
-	}
+	return appStyle.Render(m.list.View())
 }
