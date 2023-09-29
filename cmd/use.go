@@ -87,28 +87,18 @@ func useWithoutName(db *kv.DB, kubeconfigPath string) error {
 		return err
 	}
 	for _, kc := range items {
-		listItems = append(listItems, tui.Item(kc.Name))
+		listItems = append(listItems, tui.NewItem(kc.Name, "TBD"))
 	}
-
-	const defaultWidth = 30
-
-	l := list.NewModel(listItems, tui.ItemDelegate{}, defaultWidth, tui.ListHeight)
-	l.Title = "Select kubeconfig:"
-	l.SetShowStatusBar(false)
-	l.SetFilteringEnabled(false)
-	l.Styles.Title = tui.TitleStyle
-	l.Styles.PaginationStyle = tui.PaginationStyle
-	l.Styles.HelpStyle = tui.HelpStyle
 
 	// we create a new model
 	// it has a list of items and a channel,
 	// so bubbletea can send the selected item outside its runtime
-	m := tui.NewModel(l)
+	m := tui.NewModel(listItems)
 
 	// new program will take the model, and call Init,
 	// then Update and then View, and alternate between
 	// these 2 when an event (tea.Msg) is triggered (when something happens)
-	err = tea.NewProgram(m).Start()
+	_, err = tea.NewProgram(m, tea.WithAltScreen()).Run()
 	if err != nil {
 		return fmt.Errorf("error creating TUI: %s", err)
 	}
