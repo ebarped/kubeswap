@@ -7,9 +7,10 @@ import (
 )
 
 type Kubeconfig struct {
-	Name    string
-	Path    string
-	Content string
+	Name           string
+	Path           string
+	Content        string
+	CurrentContext string
 }
 
 func New(name, path string) (*Kubeconfig, error) {
@@ -25,9 +26,10 @@ func New(name, path string) (*Kubeconfig, error) {
 	}
 
 	return &Kubeconfig{
-		Name:    name,
-		Path:    path,
-		Content: string(content),
+		Name:           name,
+		Path:           path,
+		Content:        string(content),
+		CurrentContext: kubeconfig.CurrentContext,
 	}, nil
 }
 

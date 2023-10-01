@@ -129,7 +129,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 			log.Debug().Str("file", f.Name()).Msg("not a valid kubeconfig")
 			continue
 		}
-		listItems = append(listItems, tui.NewItem(kc.Name, "TBD"))
+		listItems = append(listItems, tui.NewItem(kc.Name, kc.CurrentContext))
 	}
 
 	// we create a new model
@@ -146,8 +146,6 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		retcode = 1
 		return
 	}
-
-	fmt.Println("you selected:", m.Choice)
 
 	// Once the BubbleTeam runtime is done, we receive here the choice
 	if m.Choice == "" {
