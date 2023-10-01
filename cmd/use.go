@@ -87,7 +87,7 @@ func useWithoutName(db *kv.DB, kubeconfigPath string) error {
 		return err
 	}
 	for _, kc := range items {
-		listItems = append(listItems, tui.NewItem(kc.Name, "TBD"))
+		listItems = append(listItems, tui.NewItem(kc.Name, kc.CurrentContext))
 	}
 
 	// we create a new model
