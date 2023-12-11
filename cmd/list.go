@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"cmp"
 	"fmt"
 	"os"
+	"slices"
 
+	"github.com/ebarped/kubeswap/pkg/kubeconfig"
 	"github.com/ebarped/kubeswap/pkg/kv"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
@@ -34,8 +37,6 @@ func listFunc(cmd *cobra.Command, args []string) {
 	}
 	defer db.Close()
 
-	var list []pterm.BulletListItem
-
 	items, err := db.GetAll()
 	if err != nil {
 		log.Error().Str("error", err.Error()).Msg("error listing items from database")
@@ -49,6 +50,11 @@ func listFunc(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	slices.SortFunc(items, func(a, b kubeconfig.Kubeconfig) int {
+		return cmp.Compare(a.Name, b.Name)
+	})
+
+	list := make([]pterm.BulletListItem, 0, len(items))
 	for _, kc := range items {
 		list = append(list, pterm.BulletListItem{
 			Level:       0,
