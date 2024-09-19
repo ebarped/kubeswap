@@ -15,7 +15,10 @@ func newListDelegate(keys KeyMap) list.DefaultDelegate {
 
 	// keys to show in help menu (additionally to the default)
 	// to override this, we would have to reimplement the help.KeyMap interface (not sure)
-	help := []key.Binding{keys.SelectItem}
+	help := []key.Binding{
+		keys.SelectItem,
+		keys.NextItem,
+	}
 
 	// override help
 	d.ShortHelpFunc = func() []key.Binding {

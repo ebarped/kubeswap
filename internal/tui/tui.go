@@ -1,6 +1,8 @@
 package tui
 
 import (
+	"strconv"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -16,7 +18,7 @@ var appStyle = lipgloss.NewStyle().Padding(1, 2)
 
 type item struct {
 	title   string // title showed in list
-	context string // NOT_IMPLEMENTED: context obtained from the kubeconfig
+	context string // context obtained from the kubeconfig
 }
 
 func NewItem(title, context string) item {
@@ -41,7 +43,7 @@ type Model struct {
 func NewModel(items []list.Item) *Model {
 	// setup list
 	l := list.New(items, newListDelegate(Keys), defaultWidth, defaultHeight)
-	l.Title = "⎈ Select kubeconfig⎈"
+	l.Title = "⎈ Select kubeconfig:"
 	l.Styles.Title = lipgloss.NewStyle().Foreground(lipgloss.Color("#038cfc")).Padding(0, 1).Bold(true)
 	l.SetFilteringEnabled(true) // enable filtering using Item.FilterValue()
 
@@ -74,6 +76,26 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.list.FilterState() == list.Filtering {
 			break
 		}
+		// Filter already applied
+		if m.list.FilterState() == list.FilterApplied {
+			switch {
+			case key.Matches(msg, m.keys.SelectItem):
+				i, ok := m.list.SelectedItem().(item)
+				if ok {
+					m.Choice = i.title
+				}
+				return m, tea.Quit
+
+			case key.Matches(msg, m.keys.NextItem):
+				if m.list.Index() == len(m.list.VisibleItems())-1 {
+					m.list.ResetSelected()
+				} else {
+					m.list.CursorDown()
+				}
+			}
+			break
+		}
+
 		switch {
 		case key.Matches(msg, m.keys.SelectItem):
 			i, ok := m.list.SelectedItem().(item)
@@ -81,6 +103,13 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Choice = i.title
 			}
 			return m, tea.Quit
+
+		case key.Matches(msg, m.keys.NextItem):
+			if m.list.Index() == len(m.list.Items())-1 {
+				m.list.ResetSelected()
+			} else {
+				m.list.CursorDown()
+			}
 		}
 	}
 
@@ -94,5 +123,8 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // View method renders the model into the console
 // in this case, calls the View method of the list inside my custom model
 func (m Model) View() string {
-	return appStyle.Render(m.list.View())
+	index := "index" + strconv.Itoa(m.list.Index())
+
+	len := "len" + strconv.Itoa(len(m.list.VisibleItems()))
+	return appStyle.Render(m.list.View() + index + len)
 }
