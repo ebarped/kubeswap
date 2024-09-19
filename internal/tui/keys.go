@@ -18,6 +18,7 @@ type KeyMap struct {
 	// Quit key.Binding
 	// custom app key
 	SelectItem key.Binding
+	NextItem   key.Binding
 }
 
 // bindings for each navigation key
@@ -41,6 +42,7 @@ type KeyMap struct {
 func (k KeyMap) AppKeys() []key.Binding {
 	return []key.Binding{
 		k.SelectItem,
+		k.NextItem,
 	}
 }
 
@@ -83,6 +85,10 @@ var Keys = KeyMap{
 	SelectItem: key.NewBinding(
 		key.WithKeys("enter"),
 		key.WithHelp("enter", "select kubeconfig"),
+	),
+	NextItem: key.NewBinding(
+		key.WithKeys("tab"),
+		key.WithHelp("tab", "Next item"),
 	),
 }
 
