@@ -1,8 +1,6 @@
 package tui
 
 import (
-	"strconv"
-
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -123,8 +121,5 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 // View method renders the model into the console
 // in this case, calls the View method of the list inside my custom model
 func (m Model) View() string {
-	index := "index" + strconv.Itoa(m.list.Index())
-
-	len := "len" + strconv.Itoa(len(m.list.VisibleItems()))
-	return appStyle.Render(m.list.View() + index + len)
+	return appStyle.Render(m.list.View())
 }

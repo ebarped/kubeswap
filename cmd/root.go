@@ -225,17 +225,22 @@ func copy(src, dst string) (int64, error) {
 		return 0, fmt.Errorf("%s is not a regular file", src)
 	}
 
-	source, err := os.Open(src)
+	srcFile, err := os.Open(src)
 	if err != nil {
 		return 0, err
 	}
-	defer source.Close()
+	defer srcFile.Close()
 
-	destination, err := os.Create(dst)
+	dstFile, err := os.Create(dst)
 	if err != nil {
 		return 0, err
 	}
-	defer destination.Close()
-	nBytes, err := io.Copy(destination, source)
+	defer dstFile.Close()
+
+	err = os.Chmod(dst, 0700)
+	if err != nil {
+		return 0, err
+	}
+	nBytes, err := io.Copy(dstFile, srcFile)
 	return nBytes, err
 }
