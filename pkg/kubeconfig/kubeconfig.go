@@ -20,6 +20,11 @@ func New(name, path string) (*Kubeconfig, error) {
 		return nil, err
 	}
 
+	// usage of this tool only makes sense if the kubeconfig has current-context set, so filter out other files
+	if kubeconfig.CurrentContext == "" {
+		return nil, fmt.Errorf("%q file should have 'current-context' field set", path)
+	}
+
 	content, err := k8sclientcmd.Write(*kubeconfig)
 	if err != nil {
 		return nil, err
