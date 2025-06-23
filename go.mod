@@ -1,7 +1,8 @@
 module github.com/ebarped/kubeswap
 
-go 1.21.1
-toolchain go1.24.1
+go 1.23.0
+
+toolchain go1.24.3
 
 require (
 	github.com/charmbracelet/bubbles v0.16.1
