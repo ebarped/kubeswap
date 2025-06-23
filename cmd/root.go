@@ -237,7 +237,7 @@ func copy(src, dst string) (int64, error) {
 	}
 	defer dstFile.Close()
 
-	err = os.Chmod(dst, 0700)
+	err = os.Chmod(dst, 0o700)
 	if err != nil {
 		return 0, err
 	}
