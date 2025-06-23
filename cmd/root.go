@@ -1,12 +1,14 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
 
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/fang"
 	"github.com/ebarped/kubeswap/internal/tui"
 	"github.com/ebarped/kubeswap/pkg/kubeconfig"
 	"github.com/ebarped/kubeswap/pkg/logger"
@@ -193,7 +195,7 @@ func useKubeconfig(kc *kubeconfig.Kubeconfig) error {
 
 // Execute adds all child commands to the root command, and sets flags
 func Execute() {
-	if err := rootCMD.Execute(); err != nil {
+	if err := fang.Execute(context.TODO(), rootCMD); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
