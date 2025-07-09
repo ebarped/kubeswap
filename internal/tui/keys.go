@@ -17,8 +17,9 @@ type KeyMap struct {
 	// Help key.Binding
 	// Quit key.Binding
 	// custom app key
-	SelectItem key.Binding
-	NextItem   key.Binding
+	SelectItem   key.Binding
+	NextItem     key.Binding
+	PreviousItem key.Binding
 }
 
 // bindings for each navigation key
@@ -43,6 +44,7 @@ func (k KeyMap) AppKeys() []key.Binding {
 	return []key.Binding{
 		k.SelectItem,
 		k.NextItem,
+		k.PreviousItem,
 	}
 }
 
@@ -89,6 +91,10 @@ var Keys = KeyMap{
 	NextItem: key.NewBinding(
 		key.WithKeys("tab"),
 		key.WithHelp("tab", "Next item"),
+	),
+	PreviousItem: key.NewBinding(
+		key.WithKeys("shift+tab"),
+		key.WithHelp("shift+tab", "Previous item"),
 	),
 }
 

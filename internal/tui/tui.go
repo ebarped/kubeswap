@@ -90,10 +90,16 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				} else {
 					m.list.CursorDown()
 				}
+			case key.Matches(msg, m.keys.PreviousItem):
+				if m.list.Index() == 0 {
+					m.list.ResetSelected()
+				} else {
+					m.list.CursorUp()
+				}
 			}
 			break
 		}
-
+		// Filter not applied
 		switch {
 		case key.Matches(msg, m.keys.SelectItem):
 			i, ok := m.list.SelectedItem().(item)
@@ -107,6 +113,13 @@ func (m *Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.list.ResetSelected()
 			} else {
 				m.list.CursorDown()
+			}
+
+		case key.Matches(msg, m.keys.PreviousItem):
+			if m.list.Index() == 0 {
+				m.list.ResetSelected()
+			} else {
+				m.list.CursorUp()
 			}
 		}
 	}

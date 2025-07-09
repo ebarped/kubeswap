@@ -18,6 +18,7 @@ func newListDelegate(keys KeyMap) list.DefaultDelegate {
 	help := []key.Binding{
 		keys.SelectItem,
 		keys.NextItem,
+		keys.PreviousItem,
 	}
 
 	// override help
