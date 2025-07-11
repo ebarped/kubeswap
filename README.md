@@ -74,7 +74,6 @@ kubeswap delete -n test --db /tmp/kubeswap.db
 ## TODO
 - If the file to check is a folder just skip it
 - Test in windows & mac
-- status command: add concurrency
 - Compress the db into a single file, to enable
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
