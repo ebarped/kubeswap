@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"io/ioutil"
+	"fmt"
 	"os"
 
 	"github.com/ebarped/kubeswap/pkg/kubeconfig"
@@ -48,7 +48,7 @@ func syncFunc(cmd *cobra.Command, args []string) {
 	kcRootDir := userHome + "/.kube/"
 
 	// we dont have the filename arg, so we scan the $HOME/.kube/ directory
-	files, err := ioutil.ReadDir(kcRootDir)
+	files, err := os.ReadDir(kcRootDir)
 	if err != nil {
 		log.Error().Msgf("error reading %s: %s", kcRootDir, err.Error())
 	}
@@ -60,9 +60,8 @@ func syncFunc(cmd *cobra.Command, args []string) {
 		log.Debug().Str("file", f.Name()).Str("path", kubeconfigPath).Msg("loading kubeconfig...")
 		kc, err := kubeconfig.New(f.Name(), kubeconfigPath)
 		if err != nil {
-			log.Error().Str("error", err.Error()).Msg("error creating new Kubeconfig struct")
-			retcode = 1
-			return
+			log.Debug().Str("file", f.Name()).Msg("not a valid kubeconfig")
+			continue
 		}
 
 		log.Debug().Str("action", "adding new kubeconfig to the database").Str("key", kc.Name).Str("value", kc.Content).Send()
@@ -74,4 +73,6 @@ func syncFunc(cmd *cobra.Command, args []string) {
 			return
 		}
 	}
+
+	fmt.Println("Sync successful! 🚀")
 }
