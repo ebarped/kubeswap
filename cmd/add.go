@@ -9,7 +9,7 @@ import (
 )
 
 var addCMD = &cobra.Command{
-	Use:   "add -n <name> -f <kubeconfig>",
+	Use:   "add -n <name> --kubeconfig <kubeconfig>",
 	Short: "Adds a new kubeconfig to the database",
 	Run:   addFunc,
 }

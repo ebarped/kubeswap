@@ -77,5 +77,6 @@ require (
 	github.com/charmbracelet/fang v0.1.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
+	go.etcd.io/bbolt v1.4.2
 	k8s.io/client-go v0.23.1
 )
