@@ -104,6 +104,7 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		log.Debug().Str("name", name).Str("path", path).Msg("kubeconfig successfully loaded")
 		return
 	}
+
 	// we dont have the filename arg, so we scan the $HOME/.kube/ directory
 	files, err := os.ReadDir(kcRootDir)
 	if err != nil {
