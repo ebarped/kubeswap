@@ -30,6 +30,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
+	github.com/googleapis/gnostic v0.5.5 // indirect
 	github.com/gookit/color v1.5.0 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -61,6 +62,8 @@ require (
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+	k8s.io/api v0.23.1 // indirect
 	k8s.io/apimachinery v0.23.1 // indirect
 	k8s.io/klog/v2 v2.40.1 // indirect
 	k8s.io/utils v0.0.0-20211208161948-7d6a63dca704 // indirect

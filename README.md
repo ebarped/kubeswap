@@ -27,38 +27,8 @@ I have implemented the store with 2 objectives:
 To use the store, check the help :)
 
 ## Help
-```yaml
-
-  ██   ██ ██    ██ ██████  ███████ ███████ ██     ██  █████  ██████  
-  ██  ██  ██    ██ ██   ██ ██      ██      ██     ██ ██   ██ ██   ██ 
-  █████   ██    ██ ██████  █████   ███████ ██  █  ██ ███████ ██████  
-  ██  ██  ██    ██ ██   ██ ██           ██ ██ ███ ██ ██   ██ ██      
-  ██   ██  ██████  ██████  ███████ ███████  ███ ███  ██   ██ ██
-
-Manage your kubeconfig files easily
-
-Usage:
-  kubeswap [flags]
-  kubeswap [command]
-
-Available Commands:
-  add         Adds a new kubeconfig to the database
-  completion  Generate the autocompletion script for the specified shell
-  delete      Deletes a kubeconfig from the database
-  help        Help about any command
-  list        Lists all the kubeconfigs in the db
-  print       Prints the content of the kubeconfig referenced by <name>
-  printall    Prints the content of all the kubeconfigs from the db
-  sync        Removes the current db file and recreates it with all the $HOME/.kube kubeconfigs
-  use         Select kubeconfig to use
-  version     Print the version number
-
-Flags:
-      --db string         db path (default "$HOME/.kube/kubeswap.db")
-  -h, --help              help for kubeswap
-      --loglevel string   loglevel (info/debug) (default "info")
-
-Use "kubeswap [command] --help" for more information about a command.
+```bash
+kubeswap help
 ```
 
 ## Tips
@@ -104,9 +74,7 @@ kubeswap delete -n test --db /tmp/kubeswap.db
 ## TODO
 - If the file to check is a folder just skip it
 - Test in windows & mac
-- status command:
-  - status: checks if the clusters referenced by each kubeconfig are reachable
-    - -n \<name>\: checks if the cluster of \<name\> kubeconfig is reachable
+- status command: add concurrency
 - Compress the db into a single file, to enable
   - simplicity: the user has a single file with all the database, not a directory
   - backup/restore: easier to backup, restore or move between machines
