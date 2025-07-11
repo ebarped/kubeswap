@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"slices"
+	"sync"
 
 	"github.com/ebarped/kubeswap/pkg/kubeconfig"
 	"github.com/ebarped/kubeswap/pkg/kv"
@@ -30,6 +31,9 @@ func statusFunc(cmd *cobra.Command, args []string) {
 	retcode := 0
 	defer func() { os.Exit(retcode) }()
 
+	// holds the list of kubeconfigs found (either in KUBECONFIG path or db)
+	var items []kubeconfig.Kubeconfig
+
 	if dbFlag { // check reachability of kubeconfigs stored in the database
 		log.Debug().Str("command", "status").Str("database", dbPath).Send()
 
@@ -41,7 +45,7 @@ func statusFunc(cmd *cobra.Command, args []string) {
 		}
 		defer db.Close()
 
-		items, err := db.GetAll()
+		items, err = db.GetAll()
 		if err != nil {
 			log.Error().Str("error", err.Error()).Msg("error listing items from database")
 			retcode = 1
@@ -57,25 +61,6 @@ func statusFunc(cmd *cobra.Command, args []string) {
 		slices.SortFunc(items, func(a, b kubeconfig.Kubeconfig) int {
 			return cmp.Compare(a.Name, b.Name)
 		})
-
-		list := make([]pterm.BulletListItem, 0, len(items))
-		for _, kc := range items {
-
-			itemColor := pterm.FgRed
-			if kc.Reachable() {
-				itemColor = pterm.FgGreen
-			}
-
-			list = append(list, pterm.BulletListItem{
-				Level:       0,
-				Text:        kc.Name,
-				TextStyle:   pterm.NewStyle(itemColor),
-				Bullet:      "⎈",
-				BulletStyle: pterm.NewStyle(pterm.FgBlue),
-			})
-		}
-
-		pterm.DefaultBulletList.WithItems(list).Render()
 
 	} else { // check reachability of KUBECONFIG path files
 		userHome, err := os.UserHomeDir()
@@ -95,9 +80,6 @@ func statusFunc(cmd *cobra.Command, args []string) {
 			os.Exit(0)
 		}
 
-		// holds the list of kubeconfigs found
-		var listItems []kubeconfig.Kubeconfig
-
 		for _, f := range files {
 			log.Debug().Str("file", f.Name()).Str("path", kcRootDir+f.Name()).Msg("loading kubeconfig...")
 			// skip the default kubeconfig
@@ -110,28 +92,42 @@ func statusFunc(cmd *cobra.Command, args []string) {
 				log.Debug().Str("file", f.Name()).Msg("not a valid kubeconfig")
 				continue
 			}
-			listItems = append(listItems, *kc)
+			items = append(items, *kc)
 		}
 
-		list := make([]pterm.BulletListItem, 0, len(listItems))
-		for _, kc := range listItems {
+	}
+
+	wg := sync.WaitGroup{}
+	mu := sync.Mutex{} // protects the list
+	wg.Add(len(items))
+
+	list := make([]pterm.BulletListItem, 0, len(items))
+	for _, kc := range items {
+		go func(kc kubeconfig.Kubeconfig) {
+			defer wg.Done()
+
 			itemColor := pterm.FgRed
 			if kc.Reachable() {
 				itemColor = pterm.FgGreen
 			}
 
-			list = append(list, pterm.BulletListItem{
+			item := pterm.BulletListItem{
 				Level:       0,
 				Text:        kc.Name,
 				TextStyle:   pterm.NewStyle(itemColor),
 				Bullet:      "⎈",
 				BulletStyle: pterm.NewStyle(pterm.FgBlue),
-			})
-		}
+			}
 
-		pterm.DefaultBulletList.WithItems(list).Render()
-
+			mu.Lock()
+			list = append(list, item)
+			mu.Unlock()
+		}(kc)
 	}
+
+	wg.Wait()
+
+	pterm.DefaultBulletList.WithItems(list).Render()
 
 	log.Debug().Str("command", "status").Str("result", "successful").Send()
 }
