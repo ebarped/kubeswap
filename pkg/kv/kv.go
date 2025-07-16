@@ -37,8 +37,9 @@ func (kv *DB) GetKubeconfig(key string) (*kubeconfig.Kubeconfig, error) {
 	err := kv.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte(mainBucket))
 		if b == nil {
-			return fmt.Errorf("bucket not found, you have to sync first")
+			return fmt.Errorf("db is not initialized")
 		}
+
 		val = b.Get([]byte(key))
 		if val == nil {
 			return fmt.Errorf("key does not exists in the db: %s", key)
@@ -114,7 +115,7 @@ func (kv *DB) GetAll() ([]kubeconfig.Kubeconfig, error) {
 	err := kv.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte(mainBucket))
 		if b == nil {
-			return fmt.Errorf("bucket not found, you have to sync first")
+			return fmt.Errorf("db is not initialized")
 		}
 
 		c := b.Cursor()
@@ -142,7 +143,7 @@ func (kv *DB) IsEmpty() bool {
 	err := kv.db.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte(mainBucket))
 		if b == nil {
-			return fmt.Errorf("bucket not found, you have to sync first")
+			return fmt.Errorf("db is not initialized")
 		}
 
 		c := b.Cursor()

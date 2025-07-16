@@ -31,17 +31,20 @@ var log *zerolog.Logger
 // persistentFlags are the ones that are common to all subcommands
 func init() {
 	rootCMD.PersistentFlags().StringVar(&logLevel, "loglevel", "info", "loglevel (info/debug)")
-	rootCMD.PersistentFlags().StringVar(&dbPath, "db", "$HOME/.kube/kubeswap.db", "db path")
+	rootCMD.PersistentFlags().StringVar(&dbPath, "db", defaultKubeconfigPath()+"kubeswap.db", "db path")
 }
 
 // execute common initial steps
 func initConfig(cmd *cobra.Command, args []string) {
 	// create a comon logger
 	log = logger.New(logLevel)
-	log.Debug().Msgf("loglevel set to %s", log.GetLevel().String())
+	log.Debug().Str("command", "root").Msgf("loglevel set to %s", log.GetLevel().String())
 
 	// expand the dbPath var
 	dbPath = os.ExpandEnv(dbPath)
+
+	// set default kubeconfig path
+	kcRootDir = defaultKubeconfigPath()
 }
 
 var rootCMD = &cobra.Command{
@@ -65,23 +68,17 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	retcode := 0
 	defer func() { os.Exit(retcode) }()
 
-	userHome, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal().Str("error", err.Error()).Msg("error getting the homeDir of the user")
-	}
-	kcRootDir = userHome + "/.kube/"
-
 	// we have a name arg, use that as filename to select the kubeconfig
 	if len(args) == 1 {
 		name := args[0]
-		path := kcRootDir + name
+		path := defaultKubeconfigPath() + name
 
 		// "deselect" kubeconfig
 		if name == "none" {
-			log.Debug().Str("name", name).Str("path", path).Msgf("removing default kubeconfig")
+			log.Debug().Str("command", "root").Str("name", name).Str("path", path).Msgf("removing default kubeconfig")
 			err := deleteDefaultKubeconfig()
 			if err != nil {
-				log.Error().Str("name", "none").Str("path", path).Str("error", err.Error()).Msg("error setting kubeconfig to none...")
+				log.Error().Str("command", "root").Str("name", "none").Str("path", path).Str("error", err.Error()).Msg("error setting kubeconfig to none...")
 				retcode = 1
 			}
 			retcode = 0
@@ -91,29 +88,29 @@ func rootFunc(cmd *cobra.Command, args []string) {
 		log.Debug().Str("name", name).Str("path", path).Msgf("loading kubeconfig...")
 		kc, err := kubeconfig.New(name, path)
 		if err != nil {
-			log.Error().Str("name", name).Str("path", path).Str("error", err.Error()).Msg("error loading kubeconfig")
+			log.Error().Str("command", "root").Str("name", name).Str("path", path).Str("error", err.Error()).Msg("error loading kubeconfig")
 			retcode = 1
 			return
 		}
 		err = useKubeconfig(kc)
 		if err != nil {
-			log.Error().Str("name", name).Str("path", path).Str("error", err.Error()).Msg("error selecting kubeconfig")
+			log.Error().Str("command", "root").Str("name", name).Str("path", path).Str("error", err.Error()).Msg("error selecting kubeconfig")
 			retcode = 1
 			return
 		}
-		log.Debug().Str("name", name).Str("path", path).Msg("kubeconfig successfully loaded")
+		log.Debug().Str("command", "root").Str("name", name).Str("path", path).Msg("kubeconfig successfully loaded")
 		return
 	}
 
 	// we dont have the filename arg, so we scan the $HOME/.kube/ directory
 	files, err := os.ReadDir(kcRootDir)
 	if err != nil {
-		log.Fatal().Msg(err.Error())
+		log.Fatal().Str("command", "root").Msg(err.Error())
 	}
 
 	// check if we have any kubeconfig to list
 	if len(files) == 0 {
-		log.Info().Str("path", kcRootDir).Msg("Seems that you dont have any kubeconfig files ...")
+		log.Info().Str("command", "root").Str("path", kcRootDir).Msg("Seems that you dont have any kubeconfig files ...")
 		os.Exit(0)
 	}
 
@@ -121,15 +118,15 @@ func rootFunc(cmd *cobra.Command, args []string) {
 	var listItems []list.Item
 
 	for _, f := range files {
-		log.Debug().Str("file", f.Name()).Str("path", kcRootDir+f.Name()).Msg("loading kubeconfig...")
+		log.Debug().Str("command", "root").Str("file", f.Name()).Str("path", kcRootDir+f.Name()).Msg("loading kubeconfig...")
 		// skip the default kubeconfig
 		if f.Name() == "config" {
-			log.Debug().Str("file", f.Name()).Msg("skipping default kubeconfig")
+			log.Debug().Str("command", "root").Str("file", f.Name()).Msg("skipping default kubeconfig")
 			continue
 		}
 		kc, err := kubeconfig.New(f.Name(), kcRootDir+f.Name())
 		if err != nil {
-			log.Debug().Str("file", f.Name()).Msg("not a valid kubeconfig")
+			log.Debug().Str("command", "root").Str("file", f.Name()).Msg("not a valid kubeconfig")
 			continue
 		}
 		listItems = append(listItems, tui.NewItem(kc.Name, kc.CurrentContext))
@@ -152,20 +149,20 @@ func rootFunc(cmd *cobra.Command, args []string) {
 
 	// Once the BubbleTeam runtime is done, we receive here the choice
 	if m.Choice == "" {
-		log.Debug().Msg("exit without selecting any item")
+		log.Debug().Str("command", "root").Msg("exit without selecting any item")
 		return
 	}
 
 	kc, err := kubeconfig.New(m.Choice, kcRootDir+m.Choice)
 	if err != nil {
-		log.Error().Str("file", kc.Name).Msg(err.Error())
+		log.Error().Str("command", "root").Str("file", kc.Name).Msg(err.Error())
 		retcode = 1
 		return
 	}
 
 	err = useKubeconfig(kc)
 	if err != nil {
-		log.Error().Str("file", kc.Name).Msg(err.Error())
+		log.Error().Str("command", "root").Str("file", kc.Name).Msg(err.Error())
 		retcode = 1
 		return
 	}
@@ -246,4 +243,14 @@ func copy(src, dst string) (int64, error) {
 	}
 	nBytes, err := io.Copy(dstFile, srcFile)
 	return nBytes, err
+}
+
+// defaultKubePath returns the default location of the KUBECONFIG directory
+func defaultKubeconfigPath() string {
+	userHome, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal().Str("error", err.Error()).Msg("error getting the homeDir of the user")
+	}
+
+	return userHome + "/.kube/"
 }

@@ -39,7 +39,7 @@ func statusFunc(cmd *cobra.Command, args []string) {
 
 		db, err := kv.Open(dbPath)
 		if err != nil {
-			log.Error().Str("error", err.Error()).Msg("error opening kv database")
+			log.Error().Str("command", "status").Str("error", err.Error()).Msg("error opening kv database")
 			retcode = 1
 			return
 		}
@@ -47,7 +47,7 @@ func statusFunc(cmd *cobra.Command, args []string) {
 
 		items, err = db.GetAll()
 		if err != nil {
-			log.Error().Str("error", err.Error()).Msg("error listing items from database")
+			log.Error().Str("command", "status").Str("error", err.Error()).Msg("error listing items from database")
 			retcode = 1
 			return
 		}
@@ -63,33 +63,28 @@ func statusFunc(cmd *cobra.Command, args []string) {
 		})
 
 	} else { // check reachability of KUBECONFIG path files
-		userHome, err := os.UserHomeDir()
-		if err != nil {
-			log.Fatal().Str("error", err.Error()).Msg("error getting the homeDir of the user")
-		}
-		kcRootDir = userHome + "/.kube/"
 		// we dont have the filename arg, so we scan the $HOME/.kube/ directory
-		files, err := os.ReadDir(kcRootDir)
+		files, err := os.ReadDir(defaultKubeconfigPath())
 		if err != nil {
-			log.Fatal().Msg(err.Error())
+			log.Fatal().Str("command", "status").Msg(err.Error())
 		}
 
 		// check if we have any kubeconfig to list
 		if len(files) == 0 {
-			log.Info().Str("path", kcRootDir).Msg("Seems that you dont have any kubeconfig files ...")
+			log.Info().Str("command", "status").Str("path", kcRootDir).Msg("Seems that you dont have any kubeconfig files ...")
 			os.Exit(0)
 		}
 
 		for _, f := range files {
-			log.Debug().Str("file", f.Name()).Str("path", kcRootDir+f.Name()).Msg("loading kubeconfig...")
+			log.Debug().Str("command", "status").Str("file", f.Name()).Str("path", kcRootDir+f.Name()).Msg("loading kubeconfig...")
 			// skip the default kubeconfig
 			if f.Name() == "config" {
-				log.Debug().Str("file", f.Name()).Msg("skipping default kubeconfig")
+				log.Debug().Str("command", "status").Str("file", f.Name()).Msg("skipping default kubeconfig")
 				continue
 			}
 			kc, err := kubeconfig.New(f.Name(), kcRootDir+f.Name())
 			if err != nil {
-				log.Debug().Str("file", f.Name()).Msg("not a valid kubeconfig")
+				log.Debug().Str("command", "status").Str("file", f.Name()).Msg("not a valid kubeconfig")
 				continue
 			}
 			items = append(items, *kc)

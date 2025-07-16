@@ -43,11 +43,7 @@ func useFunc(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	userHome, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal().Str("error", err.Error()).Msg("error getting the homeDir of the user")
-	}
-	kcPath := userHome + "/.kube/config"
+	kcPath := defaultKubeconfigPath()
 
 	if cmd.Flags().Changed("name") {
 		name, _ = cmd.Flags().GetString("name")
